@@ -1,5 +1,6 @@
 import React from 'react';
 import '../styling/LoginSignupPage.css';
+import { Link } from 'react-router-dom';
 
 const LoginSignupPage = () => {
     return (
@@ -10,7 +11,7 @@ const LoginSignupPage = () => {
                 <p>Please enter your credentials to log in</p>
                 <input type="text" placeholder="Username" />
                 <input type="password" placeholder="Password" />
-                <a href="#" className="forgot-password">Forgot password?</a>
+                <Link to="/forgot-password" className="forgot-password">Forgot password?</Link>
                 <center><button className="sign-in">SIGN IN</button></center>
             </div>
             <div className="signup-section">

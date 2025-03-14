@@ -67,7 +67,6 @@ input {
     color: #fff;
     padding: 10px;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
     width: 267px;
     height: 42px;
@@ -105,7 +104,6 @@ input {
     color: #fff;
     /* padding: 10px; */
     border: 2px solid #fff;
-    border-radius: 5px;
     cursor: pointer;
     width: 185px;
     height: 42px;
