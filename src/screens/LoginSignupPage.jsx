@@ -19,7 +19,7 @@ const LoginSignupPage = () => {
                 <h1>ReadSphere</h1>
                 <p className="library">LIBRARY</p>
                 <p>New to our platform? Sign Up now.</p>
-                <button className="sign-up">SIGN UP</button>
+               <Link to="/signUp"><button className="sign-up">SIGN UP</button></Link> 
             </div>
         </div>
     );

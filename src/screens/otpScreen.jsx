@@ -17,7 +17,7 @@ const OTPVerificationPage = () => {
                         className="inputfield" 
                         placeholder="OTP"
                     />
-                    <Link to="/forgot-password"><button className="verify-button">VERIFY</button></Link>
+                    <Link to="/reset-password"><button className="verify-button">VERIFY</button></Link>
                 </div>
             </div>
             <div className="rightpanel">

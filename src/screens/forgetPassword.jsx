@@ -2,9 +2,6 @@ import React from 'react';
 import '../styling/forgetPassword.css';
 import { Link } from 'react-router-dom';
 
-// const navigateTonext = () => {
-//   <Link to="/forgot-password"></Link>
-// }
 const ForgotPassword = () => {
   return (
     <div className="forgot-password-container">
