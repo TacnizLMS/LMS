@@ -1,0 +1,122 @@
+.sidebar {
+    width: 200px;
+    height: 100vh;
+    background: #a57d14;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    transition: width 0.3s ease;
+    position: relative;
+  }
+  
+  .sidebar.closed {
+    width: 60px;
+  }
+  
+  /* Logo and other styling remain unchanged */
+  .logo {
+    width: 40px;
+    height: 40px;
+    background: url('../assets/logo.png') no-repeat center/contain;
+    margin-top: 20px;
+    transition: width 0.3s ease, height 0.3s ease;
+  }
+  
+  .logo.open {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .logo1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .logo1 h2 {
+    margin-left: 10px;
+    font-size: 18px;
+    transition: opacity 0.3s;
+    color: white;
+  }
+  
+  .hide {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+  }
+  
+  .show {
+    opacity: 1;
+  }
+  
+  nav {
+    width: 100%;
+    flex-grow: 1; /* This makes the menu items take up all available space */
+  }
+  
+  .menu-items {
+    width: 100%;
+  }
+  
+  .menu-item {
+    display: flex;
+    /* align-items: center; */
+    padding: 12px;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background 0.3s;
+  }
+  
+  .menu-item:hover {
+    background: #8d6b10;
+  }
+  
+  .menu-item svg {
+    font-size: 20px;
+    margin-right: 10px;
+  }
+  
+  /* Log out button styling */
+
+.logout-btn {
+    margin-top: auto;
+    margin-left: 10px; 
+    display: block; 
+  }
+  
+  .logout-btn .menu-item {
+    display: flex;
+
+    padding: 12px;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background 0.3s;
+  }
+  
+  .logout-btn .menu-item:hover {
+    background: #8d6b10;
+  }
+  
+  .logout-btn .menu-item svg {
+    font-size: 20px;
+    margin-right: 10px;
+  }
+  
+  
+  .toggle-btn {
+    position: absolute;
+    top: 10px; 
+    right: 10px; 
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  

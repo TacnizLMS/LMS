@@ -32,7 +32,7 @@ const SignUp = () => {
             <input type="text" placeholder="Username" />
             <input type="password" placeholder="Password" />
           </div>
-          <button className="signup-btn">SIGN UP</button>
+         <Link to="/"><button className="signup-btn">SIGN UP</button></Link> 
         </div>
       </div>
     </div>
