@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ResetPassword from './screens/resetPassword';
 import SignUp from './screens/signUp';
 import Sidebar from './components/sideBar';
+import LogoutPopup from './screens/logOutPopUp';
 
 function App() {
   return (
@@ -18,7 +19,8 @@ function App() {
       <Route path='/signup' element={<SignUp />} />
       {/* <Route path='/sidebar' element={<Sidebar />} /> */}
       <Route path='/' element={<Sidebar />} />
-      
+      <Route path='/logout' element={<LogoutPopup />} />
+
 
     </Routes>
   </Router>
