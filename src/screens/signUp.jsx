@@ -13,7 +13,7 @@ const SignUp = () => {
        <Link to="/"> <button className="signin-btn">SIGN IN</button></Link>
       </div>
 
-      {/* Right Section ok*/}
+      {/* Right Section change ok*/}
       <div className="right-section">
         <h2>Sign Up</h2>
         <p className="subtitle">"Read, Return, Repeat"</p>
