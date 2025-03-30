@@ -5,6 +5,7 @@ import OtpScreen from './screens/otpScreen';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ResetPassword from './screens/resetPassword';
 import SignUp from './screens/signUp';
+import Homepage from './screens/homepage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path='/otpPage' element={<OtpScreen />} />
       <Route path='/reset-password' element={<ResetPassword />} />
       <Route path='/signup' element={<SignUp />} />
+      <Route path='/home' element={<Homepage />} />
     </Routes>
   </Router>
   );
