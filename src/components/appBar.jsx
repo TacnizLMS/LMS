@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaUserCircle, FaCog } from 'react-icons/fa';
+import {  FaCog } from 'react-icons/fa';
 import '../styling/appBar.css'; 
 import { IoMdPerson } from "react-icons/io";
 
