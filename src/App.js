@@ -5,7 +5,9 @@ import OtpScreen from './screens/otpScreen';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ResetPassword from './screens/resetPassword';
 import SignUp from './screens/signUp';
-import Homepage from './screens/homepage';
+import Sidebar from './components/sideBar';
+import LogoutPopup from './screens/logOutPopUp';
+import Dashboard from './screens/dashboard';
 
 function App() {
   return (
@@ -16,7 +18,17 @@ function App() {
       <Route path='/otpPage' element={<OtpScreen />} />
       <Route path='/reset-password' element={<ResetPassword />} />
       <Route path='/signup' element={<SignUp />} />
-      <Route path='/home' element={<Homepage />} />
+      <Route path='/sidebar' element={<Sidebar />} />
+      <Route path='/logout' element={<LogoutPopup />} />
+      <Route path='/dashboard' element={<Dashboard />} />
+      {/* <Route path='/admin' element={<Admin />} /> */}
+      {/* <Route path='/catalog' element={<Catalog />} /> */}
+      {/* <Route path='/borrowers' element={<Borrowers />} /> */}
+      {/* <Route path='/books' element={<Books />} /> */}
+      {/* <Route path='/loans' element={<Loans />} /> */}
+      {/* <Route path='/settings' element={<Settings />} /> */}
+
+
     </Routes>
   </Router>
   );

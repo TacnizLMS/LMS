@@ -24,8 +24,8 @@ const LoginSignupPage = () => {
             if (data.status) {
                 sessionStorage.setItem('jwt', data.jwt);
                 console.log('Login success:', data.message);
-                if(data.message === "Login success"){
-                    navigate('/home');
+                if(data.message === "Login success" && data.jwt !== null) {
+                    navigate('/dashboard');
                 }
                 // Redirect or perform additional actions here
             } else {
