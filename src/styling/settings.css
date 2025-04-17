@@ -1,0 +1,109 @@
+.change-credentials-container {
+    background-color: white;
+    border-radius: 12px;
+    width: 600px;
+    padding: 32px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    font-family: 'Segoe UI', sans-serif;
+    position: relative;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+  }
+  
+  .icon-box {
+    width: 48px;
+    height: 48px;
+    background-color: #d9d9d9;
+    color: #8B6C2F;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .header h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    flex: 1;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 4px;
+  }
+  
+  .gold-line {
+    margin: 20px 0;
+    border: none;
+    border-top: 2px solid #8B6C2F;
+    width: 100%;
+  }
+  
+  .form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%; 
+    max-width: 100%; 
+  }
+  
+  .form-row label {
+    flex: 1.5; 
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 150px;
+font-weight: lighter;
+  }
+  
+  .form-row input {
+    flex: 3; 
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+    min-width: 300px;
+font-weight: lighter;
+font-size: 12px;
+  }
+  
+  
+  
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+  }
+  
+  .cancel-btn {
+    background-color: #e0e0e0;
+    color: #8B6C2F;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .confirm-btn {
+    background-color: #8B6C2F;
+    color: white;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
