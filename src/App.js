@@ -7,19 +7,26 @@ import ResetPassword from './screens/resetPassword';
 import SignUp from './screens/signUp';
 import Sidebar from './components/sideBar';
 import LogoutPopup from './screens/logOutPopUp';
+import Dashboard from './screens/dashboard';
 
 function App() {
   return (
     <Router>
     <Routes>
-      {/* <Route path="/" element={<LoginSignupPage />} /> */}
+      <Route path="/" element={<LoginSignupPage />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path='/otpPage' element={<OtpScreen />} />
       <Route path='/reset-password' element={<ResetPassword />} />
       <Route path='/signup' element={<SignUp />} />
-      {/* <Route path='/sidebar' element={<Sidebar />} /> */}
-      <Route path='/' element={<Sidebar />} />
+      <Route path='/sidebar' element={<Sidebar />} />
       <Route path='/logout' element={<LogoutPopup />} />
+      <Route path='/dashboard' element={<Dashboard />} />
+      {/* <Route path='/admin' element={<Admin />} /> */}
+      {/* <Route path='/catalog' element={<Catalog />} /> */}
+      {/* <Route path='/borrowers' element={<Borrowers />} /> */}
+      {/* <Route path='/books' element={<Books />} /> */}
+      {/* <Route path='/loans' element={<Loans />} /> */}
+      {/* <Route path='/settings' element={<Settings />} /> */}
 
 
     </Routes>

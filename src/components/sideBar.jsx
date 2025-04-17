@@ -8,7 +8,7 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
 
   const menuItems = [
-    { name: "Dashboard", icon: <FaHome />, path: "/" },
+    { name: "Dashboard", icon: <FaHome />, path: "/dashboard" },
     { name: "Catalog", icon: <FaLeaf />, path: "/catalog" },
     { name: "Books", icon: <FaBook />, path: "/books" },
     { name: "Users", icon: <FaUser />, path: "/users" },

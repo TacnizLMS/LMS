@@ -12,7 +12,7 @@ const LoginSignupPage = () => {
                 <input type="text" placeholder="Username" />
                 <input type="password" placeholder="Password" />
                 <Link to="/forgot-password" className="forgot-password">Forgot password?</Link>
-                <center><button className="sign-in">SIGN IN</button></center>
+                <Link to="/dashboard"><center><button className="sign-in">SIGN IN</button></center></Link>
             </div>
             <div className="signup-section">
                 <div className="logo"></div>
