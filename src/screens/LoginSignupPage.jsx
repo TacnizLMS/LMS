@@ -4,6 +4,15 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 const LoginSignupPage = () => {
+    const decodeJwt=() => {
+        const jwt = sessionStorage.getItem('jwt');
+        if (jwt) {
+            const payload = JSON.parse(atob(jwt.split('.')[1]));
+            console.log('JWT Payload:', payload);
+        } else {
+            console.log('No JWT found in sessionStorage.');
+        }
+    }
     const navigate = useNavigate();
     const handleSignIn = async () => {
         const email = document.querySelector('input[placeholder="Email"]').value;
@@ -23,7 +32,8 @@ const LoginSignupPage = () => {
 
             if (data.status) {
                 sessionStorage.setItem('jwt', data.jwt);
-                console.log('Login success:', data.message);
+                console.log('Login message:', data.message);
+                decodeJwt();
                 if(data.message === "Login success" && data.jwt !== null) {
                     navigate('/dashboard');
                 }
