@@ -5,6 +5,15 @@ const Homepage = () => {
         // Logic to navigate to the next step or page
         console.log("Get Started clicked!");
         console.log("jwt_taken: " + sessionStorage.getItem("jwt"));
+        //print decoded jwt
+        const jwt = sessionStorage.getItem("jwt");
+        if (jwt) {
+            const payload = JSON.parse(atob(jwt.split('.')[1]));
+            console.log("Decoded JWT Payload:", payload);
+        } else {
+            console.log("No JWT found in sessionStorage.");
+        }
+
     };
     return (
         <div style={{ textAlign: 'center', padding: '20px' }}>
