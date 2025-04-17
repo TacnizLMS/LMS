@@ -33,6 +33,7 @@ const LoginSignupPage = () => {
             }
         } catch (error) {
             console.error('Error during sign-in:', error);
+            console.log('error:', error.message);
         }
     };
 
