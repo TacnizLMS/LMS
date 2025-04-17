@@ -1,0 +1,39 @@
+.custom-card {
+    position: relative;
+    width: 800px;
+    height: 100px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    box-sizing: border-box;
+    font-weight: bold;
+  }
+  
+  /* Container for the line and text */
+  .card-bottom-right {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  p{
+    font-weight: bold;
+  }
+  
+  /* Line style */
+  .card-line {
+    width: 60px;
+    height: 4px;
+    background-color: #007bff;
+    border-radius: 2px;
+  }
+  
+  /* Text style */
+  .card-label {
+    font-size: 0.85rem;
+    color: #555;
+  }
+  
