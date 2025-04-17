@@ -125,3 +125,14 @@
     cursor: pointer;
   }
   
+  .menu-item.selected {
+    background-color: white;
+    color: #8B6C2F; /* or your theme color */
+    border-radius: 8px;
+    font-weight: bold;
+  }
+  
+  .menu-item.selected svg {
+    color: #8B6C2F; /* optional: icon color when selected */
+  }
+  
