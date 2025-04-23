@@ -106,6 +106,13 @@ body {
     gap: 10px;
     margin-bottom: 15px;
   }
+
+  .rowdropdown {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    justify-content: flex-end;
+  }
   
   .row input {
     flex: 1;

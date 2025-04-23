@@ -11,13 +11,13 @@ const SignUp = () => {
     mobile: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    role: "User" // Default role
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { firstName, lastName, mobile, email, password, confirmPassword } = formData;
-    // Perform validation checks here (e.g., check if passwords match)
+    const { firstName, lastName, mobile, email, password, confirmPassword, role } = formData;
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
@@ -28,7 +28,8 @@ const SignUp = () => {
       lastName,
       mobile,
       email,
-      password
+      password,
+      role
     };
     try {
       //print dataToSend
@@ -79,6 +80,18 @@ const SignUp = () => {
         <p>Please provide your information to sign up.</p>
 
         <form className="form" onSubmit={handleSubmit}>
+        <div className="rowdropdown">
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="role-select"
+            >
+              <option value="User">User</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </div>
+        
           <div className="row">
             <input
               type="text"
@@ -112,7 +125,7 @@ const SignUp = () => {
             />
           </div>
           <div className="row">
-          <input
+            <input
               type="password"
               name="password"
               placeholder="Password"
@@ -128,7 +141,7 @@ const SignUp = () => {
             />
           </div>
           <button type="submit" className="signup-btn">SIGN UP</button>
-          </form>
+        </form>
       </div>
     </div>
   );
