@@ -41,6 +41,7 @@ const SignUp = () => {
         },
         body: JSON.stringify(dataToSend)
       });
+      alert("Email sent to verify");
       if (response.ok) {
         // Handle successful sign-up (e.g., redirect to login page)
         console.log("Sign-up successful");
