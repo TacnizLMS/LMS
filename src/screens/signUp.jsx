@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import "../styling/SignUp.css";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -14,24 +14,47 @@ const SignUp = () => {
     confirmPassword: ""
   });
 
+  const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState(""); // NEW for showing server errors
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!formData.firstName.trim()) newErrors.firstName = "First name is required.";
+    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required.";
+    if (!formData.mobile.trim()) newErrors.mobile = "Contact number is required.";
+    if (!formData.email.trim()) newErrors.email = "Email is required.";
+    if (!formData.password.trim()) newErrors.password = "Password is required.";
+    if (!formData.confirmPassword.trim()) newErrors.confirmPassword = "Confirm password is required.";
+    if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match.";
+    }
+
+    return newErrors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { firstName, lastName, mobile, email, password, confirmPassword } = formData;
-    // Perform validation checks here (e.g., check if passwords match)
-    if (password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
+    setServerError(""); // Clear server error on new submit
+
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) {
+      return; // Don't submit if errors exist
     }
-    // Prepare data to send to the server
+
+    const { firstName, lastName, mobile, email, password } = formData;
+
     const dataToSend = {
-      fullName : `${firstName} ${lastName}`,
+      fullName: `${firstName} ${lastName}`,
       lastName,
       mobile,
       email,
       password
     };
+
     try {
-      //print dataToSend
       console.log(dataToSend);
       const response = await fetch("http://localhost:8080/auth/signup", {
         method: "POST",
@@ -40,16 +63,17 @@ const SignUp = () => {
         },
         body: JSON.stringify(dataToSend)
       });
+
       if (response.ok) {
-        // Handle successful sign-up (e.g., redirect to login page)
         console.log("Sign-up successful");
         navigate("/");
       } else {
-        // Handle errors
         console.error("Sign-up failed");
+        setServerError("Something went wrong. Please try again later."); // Set server error
       }
     } catch (error) {
       console.error("Error:", error);
+      setServerError("Something went wrong. Please try again later."); // Catch block
     }
   };
 
@@ -59,8 +83,13 @@ const SignUp = () => {
       ...formData,
       [name]: value
     });
-  };
 
+    setErrors({
+      ...errors,
+      [name]: ""
+    });
+    setServerError(""); // Clear server error if user starts editing
+  };
 
   return (
     <div className="signup-container">
@@ -78,57 +107,84 @@ const SignUp = () => {
         <p className="subtitle">"Read, Return, Repeat"</p>
         <p>Please provide your information to sign up.</p>
 
+        {/* Show server error if any */}
+        {serverError && <div className="server-error">{serverError}</div>}
+
         <form className="form" onSubmit={handleSubmit}>
           <div className="row">
-            <input
-              type="text"
-              name="firstName"
-              placeholder="First Name"
-              value={formData.firstName}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Last Name"
-              value={formData.lastName}
-              onChange={handleChange}
-            />
+            <div className="input-group">
+              <input
+                type="text"
+                name="firstName"
+                placeholder="First Name"
+                value={formData.firstName}
+                onChange={handleChange}
+              />
+              {errors.firstName && <div className="error-text">{errors.firstName}</div>}
+            </div>
+
+            <div className="input-group">
+              <input
+                type="text"
+                name="lastName"
+                placeholder="Last Name"
+                value={formData.lastName}
+                onChange={handleChange}
+              />
+              {errors.lastName && <div className="error-text">{errors.lastName}</div>}
+            </div>
           </div>
+
           <div className="row">
-            <input
-              type="text"
-              name="mobile"
-              placeholder="Contact No"
-              value={formData.mobile}
-              onChange={handleChange}
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-            />
+            <div className="input-group">
+              <input
+                type="text"
+                name="mobile"
+                placeholder="Contact No"
+                value={formData.mobile}
+                onChange={handleChange}
+              />
+              {errors.mobile && <div className="error-text">{errors.mobile}</div>}
+            </div>
+
+            <div className="input-group">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+              {errors.email && <div className="error-text">{errors.email}</div>}
+            </div>
           </div>
+
           <div className="row">
-          <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-            />
-            <input
-              type="Confirm Password"
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-            />
+            <div className="input-group">
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              {errors.password && <div className="error-text">{errors.password}</div>}
+            </div>
+
+            <div className="input-group">
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
+              {errors.confirmPassword && <div className="error-text">{errors.confirmPassword}</div>}
+            </div>
           </div>
+
           <button type="submit" className="signup-btn">SIGN UP</button>
-          </form>
+        </form>
       </div>
     </div>
   );

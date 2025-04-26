@@ -136,3 +136,25 @@ body {
     background: url('../assets/logo.png') no-repeat center/contain;
     margin-bottom: 20px;
 }
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px; /* small space after each field group */
+}
+
+.error-text {
+  color: #e63946;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  margin-right: 0;
+  text-align: left;
+}
+
+.server-error {
+  color: red;
+  margin-bottom: 10px;
+  text-align: left;
+  font-size: 14px;
+  padding-left: 5px;
+}
