@@ -39,6 +39,7 @@ const LoginSignupPage = () => {
                 }
                 // Redirect or perform additional actions here
             } else {
+                alert("Login failed please try again.");
                 console.error('Login failed:', data.message);
             }
         } catch (error) {
