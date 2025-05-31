@@ -42,7 +42,7 @@ const SignUp = () => {
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) {
-      return; // Don't submit if errors exist
+      return; // on't submit if errors exist
     }
 
     const { firstName, lastName, mobile, email, password, confirmPassword, role } = formData;
