@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -36,6 +36,15 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError(""); // Clear previous server error
+
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) {
+      return; // Don't submit if errors exist
+    }
+
     const { firstName, lastName, mobile, email, password, confirmPassword, role } = formData;
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
@@ -109,7 +118,7 @@ const SignUp = () => {
         {serverError && <div className="server-error">{serverError}</div>}
 
         <form className="form" onSubmit={handleSubmit}>
-        <div className="rowdropdown">
+          <div className="rowdropdown">
             <select
               name="role"
               value={formData.role}
@@ -120,7 +129,7 @@ const SignUp = () => {
               <option value="Admin">Admin</option>
             </select>
           </div>
-        
+
           <div className="row">
             <div className="input-group">
               <input
