@@ -5,13 +5,13 @@ import "../styling/dashboard.css";
 import CustomCard from "../components/customeCard";
 import { FaBookOpen } from "react-icons/fa";
 import CustomInfoCard from "../components/customInfoCard";
-import { GiReturnArrow,GiWhiteBook  } from "react-icons/gi";
+ import { GiReturnArrow,GiWhiteBook  } from "react-icons/gi";
 
 const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <Sidebar />
-      <div className="main-content">
+      <div className="main-contentd">
         <AppBar username="Chamod Weerasinghe" role="User" />
         <div className="dashboard-body">
           <div

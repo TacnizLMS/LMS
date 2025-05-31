@@ -7,9 +7,10 @@ const CustomCard = ({ children, label }) => {
     <div className="custom-card">
       {children}
       <div className="card-bottom-right">
-        <div className="card-line"></div>
         <span className="card-label">{label}</span>
       </div>
+      <div className="card-line"></div>
+
     </div>
   );
 };
