@@ -124,3 +124,21 @@ p{
     text-align: center;
     padding-bottom: 20px;
 }
+
+.signInMoto{
+    color: white;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0px; 
+  }
+  
+  .error-text {
+    color: #f74d5b;;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    text-align: left;  
+  }
+  
