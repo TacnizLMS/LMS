@@ -9,6 +9,7 @@ import Sidebar from './components/sideBar';
 import LogoutPopup from './screens/logOutPopUp';
 import Dashboard from './screens/dashboard';
 import Catalog from './screens/catalog';
+import BooksPage from './screens/bookPage';
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
       {/* <Route path='/admin' element={<Admin />} /> */}
       <Route path='/catalog' element={<Catalog />} />
       {/* <Route path='/borrowers' element={<Borrowers />} /> */}
-      {/* <Route path='/books' element={<Books />} /> */}
+      <Route path='/books' element={<BooksPage />} />
       {/* <Route path='/loans' element={<Loans />} /> */}
       {/* <Route path='/settings' element={<Settings />} /> */}
 
