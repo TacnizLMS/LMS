@@ -11,7 +11,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <Sidebar />
-      <div className="main-content">
+      <div className="main-contentd">
         <AppBar username="Chamod Weerasinghe" role="User" />
         <div className="dashboard-body">
           <div

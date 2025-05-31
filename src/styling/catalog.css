@@ -1,0 +1,75 @@
+.library-page {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  overflow: hidden;
+}
+
+.library-page .main-contentc {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f4f4f4;
+  padding: 20px;
+  overflow-y: auto;
+  background-image: url("../assets/dashBack.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f4f4f4;
+  padding: 20px;
+  overflow-y: auto;
+  background-image: url("../assets/dashBack.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.tabs-container {
+  margin-top: 20px;
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab-buttons button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #e0e0e0;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.tab-buttons button.active {
+  background-color: #7a5c10;
+  color: white;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.books-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.books-table th,
+.books-table td {
+  padding: 12px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.books-table th {
+  background-color: #eee;
+}

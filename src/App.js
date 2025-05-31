@@ -8,6 +8,7 @@ import SignUp from './screens/signUp';
 import Sidebar from './components/sideBar';
 import LogoutPopup from './screens/logOutPopUp';
 import Dashboard from './screens/dashboard';
+import Catalog from './screens/catalog';
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
       <Route path='/logout' element={<LogoutPopup />} />
       <Route path='/dashboard' element={<Dashboard />} />
       {/* <Route path='/admin' element={<Admin />} /> */}
-      {/* <Route path='/catalog' element={<Catalog />} /> */}
+      <Route path='/catalog' element={<Catalog />} />
       {/* <Route path='/borrowers' element={<Borrowers />} /> */}
       {/* <Route path='/books' element={<Books />} /> */}
       {/* <Route path='/loans' element={<Loans />} /> */}
