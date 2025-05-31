@@ -5,7 +5,7 @@ import "../styling/dashboard.css";
 import CustomCard from "../components/customeCard";
 import { FaBookOpen } from "react-icons/fa";
 import CustomInfoCard from "../components/customInfoCard";
-import { GiReturnArrow,GiWhiteBook  } from "react-icons/gi";
+ import { GiReturnArrow,GiWhiteBook  } from "react-icons/gi";
 
 const Dashboard = () => {
   return (
