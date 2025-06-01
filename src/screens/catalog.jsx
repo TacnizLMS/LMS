@@ -42,7 +42,7 @@ const Catalog = () => {
     <div className="library-page">
       <Sidebar />
       <div className="main-contentc">
-        <AppBar username="Chamod Weerasinghe" role="User" />
+        <AppBar />
         <div className="tabs-container">
           <div className="tab-buttons">
             <button

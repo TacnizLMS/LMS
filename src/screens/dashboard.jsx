@@ -14,7 +14,7 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <Sidebar />
       <div className="main-contentd">
-        <AppBar username="Chamod Weerasinghe" role="User" />
+        <AppBar />
         <div className="dashboard-body">
           <div
             style={{

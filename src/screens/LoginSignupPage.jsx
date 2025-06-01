@@ -66,6 +66,8 @@ role: "User"
 */
       if (data.status) {
         sessionStorage.setItem("jwt", data.jwt);
+          sessionStorage.setItem("fullName", data.fullName); // Store name
+  sessionStorage.setItem("role", data.role); // Store role
         console.log("Login message:", data.message);
         decodeJwt();
         if (data.message === "Login success" && data.jwt !== null) {
