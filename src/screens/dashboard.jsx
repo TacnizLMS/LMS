@@ -8,6 +8,8 @@ import CustomInfoCard from "../components/customInfoCard";
  import { GiReturnArrow,GiWhiteBook  } from "react-icons/gi";
 
 const Dashboard = () => {
+
+
   return (
     <div className="dashboard-container">
       <Sidebar />
@@ -24,18 +26,18 @@ const Dashboard = () => {
             <CustomInfoCard
               icon={<FaBookOpen />}
               title="Your Borrowed Book List"
-              to="/borrowed-books"
+              to="/catalog"
             />
             <CustomInfoCard
               icon={<GiReturnArrow />}
               title="Your Returned Book List"
-              to="/borrowed-books"
+              to="/catalog?tab=returned"
             />
             <CustomInfoCard
-              icon={<GiWhiteBook  />}
+              icon={<GiWhiteBook />}
               title="Book Name : The Great Gatsby"
-                subtitle="Time Remaining : 2 Days"
-              to="/borrowed-books"
+              subtitle="Time Remaining : 2 Days"
+              to="/catalog"
             />
           </div>
           <center>
@@ -43,15 +45,16 @@ const Dashboard = () => {
             <h1>ReadSphere</h1>
             <p className="library">LIBRARY</p>
           </center>
-        <center> <div style={{ padding: "50px" }}>
-            <CustomCard label="~ ReadSphere Team">
-              <p>
-                "Embarking on the journey of reading cultivates personal growth,
-                paving the way to excellence and the enrichment of character."
-              </p>
-            </CustomCard>
-          </div>
-          </center> 
+          <center>
+            <div style={{ padding: "50px" }}>
+              <CustomCard label="~ ReadSphere Team">
+                <p>
+                  "Embarking on the journey of reading cultivates personal growth,
+                  paving the way to excellence and the enrichment of character."
+                </p>
+              </CustomCard>
+            </div>
+          </center>
         </div>
       </div>
     </div>
