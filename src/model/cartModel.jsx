@@ -1,9 +1,10 @@
 import React from "react";
+import "../styling/book.css";
 
 const CartModal = ({ cartItems, removeFromCart, onClose }) => {
   return (
-    <div className="modal-backdrop">
-      <div className="modal-content">
+    <div className="modal-backdrop1">
+      <div className="modal-content1">
         <h2>Cart</h2>
         <table>
           <thead>
