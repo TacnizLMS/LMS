@@ -2,12 +2,20 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from "../components/sideBar";
 import AppBar from "../components/appBar";
 import '../styling/catalog.css'; 
+import { useLocation } from 'react-router-dom';
 
 
 const Catalog = () => {
-  const [activeTab, setActiveTab] = useState('borrowed');
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+
+   const location = useLocation();
+
+  // Extract tab from URL (default to 'borrowed')
+  const queryParams = new URLSearchParams(location.search);
+  const tabParam = queryParams.get("tab") || "borrowed";
+
+  const [activeTab, setActiveTab] = useState(tabParam);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -34,7 +42,7 @@ const Catalog = () => {
     <div className="library-page">
       <Sidebar />
       <div className="main-contentc">
-        <AppBar username="Chamod Weerasinghe" role="User" />
+        <AppBar />
         <div className="tabs-container">
           <div className="tab-buttons">
             <button

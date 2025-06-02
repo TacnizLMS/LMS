@@ -30,7 +30,7 @@ const BooksPage = () => {
     <div className="library-page">
       <Sidebar />
       <div className="main-contentb">
-        <AppBar username="Chamod Weerasinghe" role="User" />
+        <AppBar />
         <br />
         <div className="tabs-container">
           <div className="tab-buttons">
