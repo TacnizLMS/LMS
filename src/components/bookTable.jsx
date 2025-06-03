@@ -16,24 +16,32 @@ const BookTable = ({ books, handleAddToCart }) => {
           </tr>
         </thead>
         <tbody>
-          {books.map((book) => (
-            <tr key={book.id}>
-              <td>{book.id}</td>
-              <td>{book.name}</td>
-              <td>{book.category}</td>
-              <td>{book.type}</td>
-              <td>{book.language}</td>
-              <td>{book.availability}</td>
-              <td>
-                {book.availability === "Available" && (
-                  <input
-                    type="checkbox"
-                    onChange={() => handleAddToCart(book)}
-                  />
-                )}
+          {books && books.length > 0 ? (
+            books.map((book) => (
+              <tr key={book.id}>
+                <td>{book.id}</td>
+                <td>{book.name}</td>
+                <td>{book.category}</td>
+                <td>{book.type}</td>
+                <td>{book.language}</td>
+                <td>{book.availability}</td>
+                <td>
+                  {book.availability === "Available" && (
+                    <input
+                      type="checkbox"
+                      onChange={() => handleAddToCart(book)}
+                    />
+                  )}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="7" style={{ textAlign: "center" }}>
+                No records found
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
