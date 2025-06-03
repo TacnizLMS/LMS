@@ -1,11 +1,25 @@
 import React from "react";
 import "../styling/book.css";
+import { IoClose } from 'react-icons/io5';
+
+import { FiShoppingCart } from "react-icons/fi";
+
 
 const CartModal = ({ cartItems, removeFromCart, onClose }) => {
   return (
     <div className="modal-backdrop1">
       <div className="modal-content1">
-        <h2>Cart</h2>
+        <div className="header">
+                <div className="icon-box">
+                  <FiShoppingCart size={28} />
+                </div>
+                <h2>Cart</h2>
+                <button className="close-btn" onClick={onClose}>
+                  <IoClose size={24} />
+                </button>
+              </div>
+              
+        <hr className="gold-line" />
         <table>
           <thead>
             <tr>
@@ -14,7 +28,7 @@ const CartModal = ({ cartItems, removeFromCart, onClose }) => {
               <th>Category</th>
               <th>Language</th>
               <th>No of Books</th>
-              <th>Delete</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -32,7 +46,11 @@ const CartModal = ({ cartItems, removeFromCart, onClose }) => {
             ))}
           </tbody>
         </table>
-        <button onClick={onClose}>Close</button>
+        <div style={{ marginTop: "20px" }}>
+          <h4>Total Books: {cartItems.length}</h4>
+                  <div style={{ marginTop: "10px" }}></div>
+          <button>Confirm</button>
+        </div>
       </div>
     </div>
   );

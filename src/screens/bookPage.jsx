@@ -6,6 +6,7 @@ import BookTable from "../components/bookTable";
 import "../styling/book.css";
 import Sidebar from "../components/sideBar";
 import AppBar from "../components/appBar";
+import { FiShoppingCart } from "react-icons/fi";
 
 const BooksPage = () => {
   const [books, setBooks] = useState([]);
@@ -32,11 +33,12 @@ const BooksPage = () => {
       <div className="main-contentb">
         <AppBar />
         <br />
-        <div className="tabs-container">
-          <div className="tab-buttons">
+        <div>
+          <div>
             <button onClick={() => setShowCart(true)}>
-              🛒 Cart ({cart.length})
+              Cart ({cart.length})
             </button>
+            <div style={{ marginTop: "20px" }}></div>
           </div>
         </div>
 

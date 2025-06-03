@@ -20,6 +20,7 @@ const Sidebar = () => {
     { name: "Dashboard", icon: <FaHome />, path: "/dashboard" },
     { name: "Catalog", icon: <FaLeaf />, path: "/catalog" },
     { name: "Books", icon: <FaBook />, path: "/books" },
+    // To do: add user role based access control
     { name: "Users", icon: <FaUser />, path: "/users" },
     { name: "Fine", icon: <FaMoneyBill />, path: "/fine" },
   ];
