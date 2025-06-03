@@ -6,7 +6,7 @@
   }
   
   .sidebar {
-    width: 250px; /* Or whatever width your Sidebar has */
+    width: 250px; 
     flex-shrink: 0;
   }
   
@@ -18,9 +18,9 @@
     background-color: #f4f6f8;
   }
   
-  .app-bar {
+  /* .app-bar {
     width: 100%;
-  }
+  } */
   
   .dashboard-body {
     flex: 1;

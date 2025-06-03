@@ -69,6 +69,8 @@ const Catalog = () => {
                     <th>ID</th>
                     <th>User ID</th>
                     <th>Quantity</th>
+                    <th>Book ID</th>
+                    <th>Book Name</th>
                     <th>{activeTab === 'borrowed' ? 'Due Date' : 'Returned Date'}</th>
                   </tr>
                 </thead>
@@ -79,6 +81,8 @@ const Catalog = () => {
                         <td>{book.id}</td>
                         <td>{book.userId}</td>
                         <td>{book.quantity}</td>
+                        <td>{book.bookId}</td>
+                        <td>{book.bookName}</td>
                         <td>
                           {activeTab === 'borrowed' ? book.dueDate : book.returnedDate}
                         </td>
@@ -86,7 +90,7 @@ const Catalog = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="4">No records found.</td>
+                      <td colSpan="6">No records found.</td>
                     </tr>
                   )}
                 </tbody>

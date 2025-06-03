@@ -6,7 +6,6 @@ import BookTable from "../components/bookTable";
 import "../styling/book.css";
 import Sidebar from "../components/sideBar";
 import AppBar from "../components/appBar";
-import { FiShoppingCart } from "react-icons/fi";
 
 const BooksPage = () => {
   const [books, setBooks] = useState([]);
