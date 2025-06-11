@@ -1,7 +1,17 @@
 // components/bookTable.js
 import React from "react";
 
-const BookTable = ({ books, handleAddToCart }) => {
+const BookTable = ({ books, cart, handleAddToCart, handleRemoveFromCart }) => {
+  const isChecked = (bookId) => cart.some((item) => item.id === bookId);
+
+  const handleCheckboxChange = (book, checked) => {
+    if (checked) {
+      handleAddToCart(book);
+    } else {
+      handleRemoveFromCart(book.id);
+    }
+  };
+
   return (
     <div className="table-wrapper">
       <table className="books-table">
@@ -28,9 +38,11 @@ const BookTable = ({ books, handleAddToCart }) => {
                 <td>{book.language}</td>
                 <td>{book.quantity}</td>
                 <td>
-                  <span 
+                  <span
                     className={`availability-status ${
-                      book.availability === 'Available' ? 'available' : 'not-available'
+                      book.availability === "Available"
+                        ? "available"
+                        : "not-available"
                     }`}
                   >
                     {book.availability}
@@ -40,7 +52,10 @@ const BookTable = ({ books, handleAddToCart }) => {
                   {book.availability === "Available" && (
                     <input
                       type="checkbox"
-                      onChange={() => handleAddToCart(book)}
+                      checked={isChecked(book.id)}
+                      onChange={(e) =>
+                        handleCheckboxChange(book, e.target.checked)
+                      }
                     />
                   )}
                 </td>

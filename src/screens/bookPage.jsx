@@ -41,7 +41,13 @@ const BooksPage = () => {
           </div>
         </div>
 
-        <BookTable books={books} handleAddToCart={handleAddToCart} />
+       <BookTable
+  books={books}
+  cart={cart}
+  handleAddToCart={handleAddToCart}
+  handleRemoveFromCart={removeFromCart}
+/>
+
         {showCart && (
           <CartModal
             cartItems={cart}
