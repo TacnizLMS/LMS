@@ -65,7 +65,7 @@ password: "123456"
 role: "User"
 */
       if (data.status) {
-        sessionStorage.setItem("jwt", data.jwt);
+sessionStorage.setItem("jwt", `Bearer ${data.jwt}`); // ✅ includes Bearer prefix
           sessionStorage.setItem("fullName", data.fullName); // Store name
   sessionStorage.setItem("role", data.role); // Store role
         console.log("Login message:", data.message);

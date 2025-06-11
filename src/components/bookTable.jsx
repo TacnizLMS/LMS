@@ -1,3 +1,4 @@
+// components/bookTable.js
 import React from "react";
 
 const BookTable = ({ books, handleAddToCart }) => {
@@ -7,10 +8,11 @@ const BookTable = ({ books, handleAddToCart }) => {
         <thead>
           <tr>
             <th>Book ID</th>
-            <th>Name</th>
-            <th>Category</th>
+            <th>Title</th>
+            <th>Author</th>
             <th>Type</th>
             <th>Language</th>
+            <th>Quantity</th>
             <th>Availability</th>
             <th>Add to Cart</th>
           </tr>
@@ -24,7 +26,16 @@ const BookTable = ({ books, handleAddToCart }) => {
                 <td>{book.category}</td>
                 <td>{book.type}</td>
                 <td>{book.language}</td>
-                <td>{book.availability}</td>
+                <td>{book.quantity}</td>
+                <td>
+                  <span 
+                    className={`availability-status ${
+                      book.availability === 'Available' ? 'available' : 'not-available'
+                    }`}
+                  >
+                    {book.availability}
+                  </span>
+                </td>
                 <td>
                   {book.availability === "Available" && (
                     <input
@@ -37,7 +48,7 @@ const BookTable = ({ books, handleAddToCart }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="7" style={{ textAlign: "center" }}>
+              <td colSpan="8" style={{ textAlign: "center" }}>
                 No records found
               </td>
             </tr>
