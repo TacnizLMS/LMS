@@ -30,7 +30,6 @@ const CartModal = ({ cartItems, removeFromCart, onClose }) => {
               <th></th>
             </tr>
           </thead>
-          <tr style={{ height: "16px" }}></tr>
           <tbody>
             {cartItems.length === 0 ? (
               <tr>
@@ -38,16 +37,24 @@ const CartModal = ({ cartItems, removeFromCart, onClose }) => {
               </tr>
             ) : (
               cartItems.map((book, index) => (
-                <tr key={index}>
-                  <td>{book.id}</td>
-                  <td>{book.name}</td>
-                  <td>{book.category}</td>
-                  <td>{book.language}</td>
-                  <td>1</td>
-                  <td>
-                    <button onClick={() => removeFromCart(book.id)}>Delete</button>
-                  </td>
-                </tr>
+                <React.Fragment key={index}>
+                  <tr>
+                    <td>{book.id}</td>
+                    <td>{book.name}</td>
+                    <td>{book.category}</td>
+                    <td>{book.language}</td>
+                    <td>1</td>
+                    <td>
+                      <button onClick={() => removeFromCart(book.id)}>Delete</button>
+                    </td>
+                  </tr>
+                  {/* Add gap between rows except after the last row */}
+                  {index !== cartItems.length - 1 && (
+                    <tr style={{ height: "10px" }}>
+                      <td colSpan="6"></td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))
             )}
           </tbody>
