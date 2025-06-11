@@ -19,15 +19,15 @@ const CartModal = ({ cartItems, removeFromCart, onClose }) => {
           </button>
         </div>
         <hr className="gold-line" />
-        <table>
+        <table style={{ borderCollapse: "separate", borderSpacing: "0 0.5rem" }}>
           <thead>
             <tr>
-              <th>Book ID</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Language</th>
-              <th>No of Books</th>
-              <th></th>
+              <th style={{ padding: "0 16px" }}>Book ID</th>
+              <th style={{ padding: "0 16px" }}>Name</th>
+              <th style={{ padding: "0 16px" }}>Category</th>
+              <th style={{ padding: "0 16px" }}>Language</th>
+              <th style={{ padding: "0 16px" }}>No of Books</th>
+              <th style={{ padding: "0 16px" }}></th>
             </tr>
           </thead>
           <tbody>
@@ -39,18 +39,18 @@ const CartModal = ({ cartItems, removeFromCart, onClose }) => {
               cartItems.map((book, index) => (
                 <React.Fragment key={index}>
                   <tr>
-                    <td>{book.id}</td>
-                    <td>{book.name}</td>
-                    <td>{book.category}</td>
-                    <td>{book.language}</td>
-                    <td>1</td>
-                    <td>
+                    <td style={{ padding: "8px 16px" }}>{book.id}</td>
+                    <td style={{ padding: "8px 16px" }}>{book.name}</td>
+                    <td style={{ padding: "8px 16px" }}>{book.category}</td>
+                    <td style={{ padding: "8px 16px" }}>{book.language}</td>
+                    <td style={{ padding: "8px 16px" }}>1</td>
+                    <td style={{ padding: "8px 16px" }}>
                       <button onClick={() => removeFromCart(book.id)}>Delete</button>
                     </td>
                   </tr>
                   {/* Add gap between rows except after the last row */}
                   {index !== cartItems.length - 1 && (
-                    <tr style={{ height: "10px" }}>
+                    <tr style={{ height: "5px" }}>
                       <td colSpan="6"></td>
                     </tr>
                   )}
