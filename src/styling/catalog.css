@@ -382,3 +382,20 @@
     padding: 15px;
   }
 }
+
+.books-table select {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+}
+
+.edit-icon {
+  cursor: pointer;
+  color: #856404;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.edit-icon:hover {
+  color: #785c14;
+}
+

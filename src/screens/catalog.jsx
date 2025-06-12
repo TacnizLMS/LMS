@@ -18,7 +18,7 @@ const Catalog = () => {
 
   const [activeTab, setActiveTab] = useState(tabParam);
 
-  // Get user ID from localStorage or wherever you store it
+  // Get user ID from localStorage 
   const getUserId = () => {
     return sessionStorage.getItem("userId"); 
   };

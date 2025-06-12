@@ -18,11 +18,13 @@ const getAuthToken = () => {
   return rawToken.startsWith("Bearer ") ? rawToken : `Bearer ${rawToken}`;
 };
 
+// Function to fetch catalogs for a user
 export const fetchCatalogs = async (userId) => {
   try {
     const url = `${API_BASE_URL}/catalog/user/${userId}`;
     console.log('Fetching catalogs from:', url);
 
+    // Get the auth token
     const token = getAuthToken();
     console.log('Using token:', token ? `${token.substring(0, 20)}...` : 'No token found');
 
@@ -73,7 +75,7 @@ export const fetchCatalogs = async (userId) => {
   }
 };
 
-
+// Function to create a new catalog
 export const createCatalog = async ({ userId, books }) => {
   try {
     const url = `${API_BASE_URL}/catalog/add`;
@@ -120,3 +122,44 @@ export const createCatalog = async ({ userId, books }) => {
   }
 };
 
+//fetch all catalogs
+export const fetchAllCatalogs = async () => {
+  try {
+    const url = `${API_BASE_URL}/catalog/all`;
+    console.log('Fetching all catalogs from:', url);
+
+    const token = getAuthToken();
+    console.log('Using token for fetchAllCatalogs:', token ? `${token.substring(0, 20)}...` : 'No token found');
+
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = token;
+    }
+
+    console.log('Request headers:', headers);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+
+    console.log('Response status:', response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error fetching all catalogs:', errorText);
+      throw new Error(`Failed to fetch all catalogs. Status: ${response.status}, Message: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('Fetched all catalogs:', data);
+
+    return data;
+
+  } catch (error) {
+    console.error('Error in fetchAllCatalogs:', error);
+    throw error;
+  }
+};
