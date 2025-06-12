@@ -1,11 +1,10 @@
 .library-page {
-  height: 100vh;
-  width: 100vw;
   display: flex;
-  overflow: hidden;
+  min-height: 100vh;
+  background-color: #f8f9fa;
 }
 
-.library-page .main-contentc {
+.main-contentc {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -17,59 +16,369 @@
   background-position: center;
 }
 
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: #f4f4f4;
-  padding: 20px;
-  overflow-y: auto;
-  background-image: url("../assets/dashBack.png");
-  background-size: cover;
-  background-position: center;
-}
-
+/* Tabs Container */
 .tabs-container {
-  margin-top: 20px;
+  padding: 20px;
+  flex: 1;
 }
 
 .tab-buttons {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 10px;
 }
 
 .tab-buttons button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
-  background-color: #e0e0e0;
+  background-color: #ffffff;
+  color: #6c757d;
+  border-radius: 8px 8px 0 0;
   cursor: pointer;
-  border-radius: 4px;
-  font-weight: 600;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-buttons button:hover {
+  background-color: #f8f9fa;
+  color: #495057;
 }
 
 .tab-buttons button.active {
-  background-color: #7a5c10;
+  background-color: #a57d14;
+  color: white;
+  border-bottom-color: #a57d14;
+}
+
+.tab-buttons button.expired-tab {
+  color: #dc3545;
+}
+
+.tab-buttons button.expired-tab:hover {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.tab-buttons button.expired-tab.active {
+  background-color: #dc3545;
+  color: white;
+  border-bottom-color: #dc3545;
+}
+
+/* Tab Count Badges */
+.tab-count {
+  background-color: #6c757d;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.tab-buttons button.active .tab-count {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.tab-count.expired-count {
+  background-color: #dc3545;
+  animation: pulse 2s infinite;
+}
+
+.tab-buttons button.expired-tab.active .tab-count.expired-count {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Loading and Error States */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 16px;
+  color: #6c757d;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 40px;
+  text-align: center;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 16px;
+  margin: 0;
+}
+
+.error-container button {
+  padding: 10px 20px;
+  background-color: #a57d14;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.error-container button:hover {
+  background-color: #8d6b10;
+}
+
+/* Catalogs Container */
+.catalogs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Catalog Card */
+.catalog-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.catalog-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Catalog Header */
+.catalog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  background: #785c14;
   color: white;
 }
 
+.catalog-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+}
+
+.catalog-info p {
+  margin: 4px 0;
+  font-size: 14px;
+  opacity: 0.9;
+  color: white;
+}
+
+.catalog-dates {
+  text-align: right;
+}
+
+.catalog-dates p {
+  margin: 4px 0;
+  font-size: 14px;
+  opacity: 0.9;
+  color: white;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.status-badge.active {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-badge.overdue {
+  background-color: orange;
+  color: black;
+}
+
+.status-badge.completed {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* Fine Amount */
+.fine-amount {
+  color: white !important;
+  font-weight: 800 !important;
+  font-size: larger !important;
+}
+
+/* Books List Section */
+.books-list {
+  padding: 20px;
+}
+
+.books-list h4 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Table Styles */
 .table-wrapper {
   overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .books-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: white;
-}
-
-.books-table th,
-.books-table td {
-  padding: 12px;
-  border: 1px solid #ccc;
-  text-align: center;
+  background: white;
+  margin: 0;
 }
 
 .books-table th {
-  background-color: #eee;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 2px solid #dee2e6;
+  font-size: 14px;
+}
+
+.books-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 14px;
+  color: #495057;
+}
+
+.books-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.books-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status Indicators */
+.status-indicator {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-indicator.paid {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-indicator.unpaid {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-indicator.returned {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-indicator.not-returned {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* No Data State */
+.no-data {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.no-data p {
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-contentc {
+    margin-left: 0;
+  }
+  
+  .catalog-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .catalog-dates {
+    text-align: left;
+  }
+  
+  .tab-buttons {
+    flex-direction: column;
+  }
+  
+  .tab-buttons button {
+    border-radius: 8px;
+    border-bottom: none;
+    border-left: 3px solid transparent;
+  }
+  
+  .tab-buttons button.active {
+    border-left-color: #007bff;
+    border-bottom: none;
+  }
+  
+  .books-table {
+    font-size: 12px;
+  }
+  
+  .books-table th,
+  .books-table td {
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabs-container {
+    padding: 10px;
+  }
+  
+  .catalog-header {
+    padding: 15px;
+  }
+  
+  .books-list {
+    padding: 15px;
+  }
 }
