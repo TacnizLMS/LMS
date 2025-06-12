@@ -16,14 +16,38 @@ const BooksPage = () => {
     fetchBooks().then(setBooks).catch(console.error);
   }, []);
 
+   // Get user ID from localStorage or wherever you store it
+const getUserId = () => {
+    return sessionStorage.getItem("userId"); 
+  };
+
   const handleAddToCart = (book) => {
-    if (!cart.some((item) => item.id === book.id)) {
-      setCart([...cart, book]);
+    const existing = cart.find((item) => item.id === book.id);
+    if (!existing) {
+      setCart([...cart, { ...book, quantity: 1 }]);
     }
   };
 
-  const removeFromCart = (id) => {
-    setCart(cart.filter((item) => item.id !== id));
+  const handleRemoveFromCart = (bookId) => {
+    setCart(cart.filter((item) => item.id !== bookId));
+  };
+
+  const handleIncreaseQuantity = (bookId) => {
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.id === bookId ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+  };
+
+  const handleDecreaseQuantity = (bookId) => {
+    setCart((prevCart) =>
+      prevCart
+        .map((item) =>
+          item.id === bookId ? { ...item, quantity: item.quantity - 1 } : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
   };
 
   return (
@@ -33,26 +57,30 @@ const BooksPage = () => {
         <AppBar />
         <br />
         <div>
-          <div>
-            <button onClick={() => setShowCart(true)}>
-              Cart ({cart.length})
-            </button>
-            <div style={{ marginTop: "20px" }}></div>
-          </div>
+          <button onClick={() => setShowCart(true)}>
+            Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})
+          </button>
+                      <div style={{ marginTop: "20px" }}></div>
+
         </div>
 
-       <BookTable
-  books={books}
-  cart={cart}
-  handleAddToCart={handleAddToCart}
-  handleRemoveFromCart={removeFromCart}
-/>
+        <BookTable
+          books={books}
+          cart={cart}
+          handleAddToCart={handleAddToCart}
+          handleRemoveFromCart={handleRemoveFromCart}
+          handleIncreaseQuantity={handleIncreaseQuantity}
+          handleDecreaseQuantity={handleDecreaseQuantity}
+        />
 
         {showCart && (
           <CartModal
             cartItems={cart}
-            removeFromCart={removeFromCart}
+            removeFromCart={handleRemoveFromCart}
+            increaseQty={handleIncreaseQuantity}
+            decreaseQty={handleDecreaseQuantity}
             onClose={() => setShowCart(false)}
+            userId={getUserId()}
           />
         )}
       </div>

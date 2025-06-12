@@ -65,9 +65,12 @@ password: "123456"
 role: "User"
 */
       if (data.status) {
-sessionStorage.setItem("jwt", `Bearer ${data.jwt}`); // ✅ includes Bearer prefix
+sessionStorage.setItem("jwt", `Bearer ${data.jwt}`); // includes Bearer prefix
           sessionStorage.setItem("fullName", data.fullName); // Store name
   sessionStorage.setItem("role", data.role); // Store role
+  const payload = JSON.parse(atob(data.jwt.split(".")[1]));
+  sessionStorage.setItem("userId", payload.id);
+  console.log("User ID:", payload.id);
         console.log("Login message:", data.message);
         decodeJwt();
         if (data.message === "Login success" && data.jwt !== null) {

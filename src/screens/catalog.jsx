@@ -20,8 +20,7 @@ const Catalog = () => {
 
   // Get user ID from localStorage or wherever you store it
   const getUserId = () => {
-    // You might need to adjust this based on how you store user ID
-    return localStorage.getItem("userId") || "o4rBPPB"; // fallback to example userId
+    return sessionStorage.getItem("userId"); 
   };
 
   useEffect(() => {
