@@ -1,8 +1,17 @@
 // components/bookTable.js
 import React from "react";
 
-const BookTable = ({ books, cart, handleAddToCart, handleRemoveFromCart }) => {
-  const isChecked = (bookId) => cart.some((item) => item.id === bookId);
+const BookTable = ({
+  books,
+  cart,
+  handleAddToCart,
+  handleRemoveFromCart,
+  handleIncreaseQuantity,
+  handleDecreaseQuantity,
+}) => {
+  const isInCart = (bookId) => cart.some((item) => item.id === bookId);
+  const getQuantity = (bookId) =>
+    cart.find((item) => item.id === bookId)?.quantity || 0;
 
   const handleCheckboxChange = (book, checked) => {
     if (checked) {
@@ -25,6 +34,7 @@ const BookTable = ({ books, cart, handleAddToCart, handleRemoveFromCart }) => {
             <th>Quantity</th>
             <th>Availability</th>
             <th>Add to Cart</th>
+            <th>Set Quantity</th> {/* New column */}
           </tr>
         </thead>
         <tbody>
@@ -52,18 +62,27 @@ const BookTable = ({ books, cart, handleAddToCart, handleRemoveFromCart }) => {
                   {book.availability === "Available" && (
                     <input
                       type="checkbox"
-                      checked={isChecked(book.id)}
+                      checked={isInCart(book.id)}
                       onChange={(e) =>
                         handleCheckboxChange(book, e.target.checked)
                       }
                     />
                   )}
                 </td>
+                <td>
+                  {isInCart(book.id) && (
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <button onClick={() => handleDecreaseQuantity(book.id)}>-</button>
+                      <span>{getQuantity(book.id)}</span>
+                      <button onClick={() => handleIncreaseQuantity(book.id)}>+</button>
+                    </div>
+                  )}
+                </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="8" style={{ textAlign: "center" }}>
+              <td colSpan="9" style={{ textAlign: "center" }}>
                 No records found
               </td>
             </tr>
@@ -73,5 +92,7 @@ const BookTable = ({ books, cart, handleAddToCart, handleRemoveFromCart }) => {
     </div>
   );
 };
+
+
 
 export default BookTable;

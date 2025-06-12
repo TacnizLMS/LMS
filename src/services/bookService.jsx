@@ -5,26 +5,16 @@ const API_BASE_URL = 'http://localhost:8080/api';
 // Debug function to check all possible token locations
 const getAuthToken = () => {
   const possibleTokens = {
-    token: localStorage.getItem("token"),
-    authToken: localStorage.getItem("authToken"),
-    jwt: sessionStorage.getItem("jwt"), // Your current key
-    accessToken: localStorage.getItem("accessToken"),
-    sessionToken: sessionStorage.getItem("token"),
-    sessionAuthToken: sessionStorage.getItem("authToken"),
+    jwt: sessionStorage.getItem("jwt"),
   };
 
   console.log("All possible tokens:", possibleTokens);
 
-  const rawToken = possibleTokens.jwt || 
-                   possibleTokens.token || 
-                   possibleTokens.authToken || 
-                   possibleTokens.accessToken ||
-                   possibleTokens.sessionToken ||
-                   possibleTokens.sessionAuthToken;
+  const rawToken = possibleTokens.jwt;
 
   if (!rawToken) return null;
 
-  // ✅ Add Bearer prefix
+  // Add Bearer prefix
   return rawToken.startsWith("Bearer ") ? rawToken : `Bearer ${rawToken}`;
 };
 

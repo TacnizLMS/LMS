@@ -5,26 +5,16 @@ const API_BASE_URL = 'http://localhost:8080/api';
 // Debug function to get auth token from various storage locations
 const getAuthToken = () => {
   const possibleTokens = {
-    token: localStorage.getItem("token"),
-    authToken: localStorage.getItem("authToken"),
     jwt: sessionStorage.getItem("jwt"),
-    accessToken: localStorage.getItem("accessToken"),
-    sessionToken: sessionStorage.getItem("token"),
-    sessionAuthToken: sessionStorage.getItem("authToken"),
   };
 
   console.log("All possible tokens:", possibleTokens);
 
-  const rawToken =
-    possibleTokens.jwt ||
-    possibleTokens.token ||
-    possibleTokens.authToken ||
-    possibleTokens.accessToken ||
-    possibleTokens.sessionToken ||
-    possibleTokens.sessionAuthToken;
+  const rawToken = possibleTokens.jwt;
 
   if (!rawToken) return null;
 
+  // Add Bearer prefix
   return rawToken.startsWith("Bearer ") ? rawToken : `Bearer ${rawToken}`;
 };
 
@@ -82,3 +72,51 @@ export const fetchCatalogs = async (userId) => {
     throw error;
   }
 };
+
+
+export const createCatalog = async ({ userId, books }) => {
+  try {
+    const url = `${API_BASE_URL}/catalog/add`;
+
+    const token = getAuthToken();
+    console.log('Using token for createCatalog:', token ? `${token.substring(0, 20)}...` : 'No token found');
+
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = token;
+    }
+
+    const body = JSON.stringify({
+      userId,
+      books,
+    });
+
+    console.log('Creating catalog with payload:', body);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body,
+    });
+
+    console.log('CreateCatalog response status:', response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('CreateCatalog error response:', errorText);
+      throw new Error(`Failed to create catalog. Status: ${response.status}, Message: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('Catalog created successfully:', result);
+
+    return result;
+
+  } catch (error) {
+    console.error('Error in createCatalog:', error);
+    throw error;
+  }
+};
+
