@@ -66,11 +66,16 @@ role: "User"
 */
       if (data.status) {
 sessionStorage.setItem("jwt", `Bearer ${data.jwt}`); // includes Bearer prefix
-          sessionStorage.setItem("fullName", data.fullName); // Store name
-  sessionStorage.setItem("role", data.role); // Store role
+
   const payload = JSON.parse(atob(data.jwt.split(".")[1]));
+
+          sessionStorage.setItem("fullName", payload.email); // Store name
+  sessionStorage.setItem("role", payload.roles); // Store role
+  
   sessionStorage.setItem("userId", payload.id);
-  console.log("User ID:", payload.id);
+
+  console.log("User Role:", payload.roles);
+
         console.log("Login message:", data.message);
         decodeJwt();
         if (data.message === "Login success" && data.jwt !== null) {
