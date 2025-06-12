@@ -34,7 +34,7 @@ const BookTable = ({
             <th>Quantity</th>
             <th>Availability</th>
             <th>Add to Cart</th>
-            <th>Set Quantity</th> {/* New column */}
+            <th>Set Quantity</th> 
           </tr>
         </thead>
         <tbody>

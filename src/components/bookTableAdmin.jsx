@@ -1,0 +1,137 @@
+// components/bookTable.js
+import React from "react";
+
+const BookTableAdmin = ({ books }) => {
+  return (
+    <div className="table-wrapper">
+      <table className="books-table">
+        <thead>
+          <tr>
+            <th>Book ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Type</th>
+            <th>Language</th>
+            <th>Quantity</th>
+            <th>Availability</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {books && books.length > 0 ? (
+            books.map((book) => (
+              <tr key={book.id}>
+                <td>{book.id}</td>
+                <td>{book.name}</td>
+                <td>{book.category}</td>
+                <td>{book.type}</td>
+                <td>{book.language}</td>
+                <td>{book.quantity}</td>
+                <td>
+                  <span
+                    className={`availability-status ${
+                      book.availability === "Available"
+                        ? "available"
+                        : "not-available"
+                    }`}
+                  >
+                    {book.availability}
+                  </span>
+                </td>
+
+                <td>
+                  <button
+                    title="Edit"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      marginRight: 8,
+                      color: "black",
+                    }}
+                    onClick={() => alert(`Edit book ${book.id}`)}
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 20h9" />
+                      <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+                    </svg>
+                  </button>
+                  <button
+                    title="Delete"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      marginRight: 8,
+                      color: "black",
+                    }}
+                    onClick={() => alert(`Delete book ${book.id}`)}
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+                      <line x1="10" y1="11" x2="10" y2="17" />
+                      <line x1="14" y1="11" x2="14" y2="17" />
+                    </svg>
+                  </button>
+                  <button
+                    title="Book Info"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "black",
+                    }}
+                    onClick={() => alert(`Book info for ${book.id}`)}
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                      <path d="M20 22V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v16" />
+                      <path d="M16 2v4" />
+                      <path d="M8 2v4" />
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="9" style={{ textAlign: "center" }}>
+                No records found
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default BookTableAdmin;
