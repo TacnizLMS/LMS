@@ -1,15 +1,12 @@
 import React from "react";
-import Sidebar from "../components/sideBar";
-import AppBar from "../components/appBar";
-import "../styling/dashboard.css";
-import CustomCard from "../components/customeCard";
-import { FaBookOpen } from "react-icons/fa";
-import CustomInfoCard from "../components/customInfoCard";
- import { GiReturnArrow,GiWhiteBook  } from "react-icons/gi";
+import Sidebar from "../../components/sideBar";
+import AppBar from "../../components/appBar";
+import "../../styling/dashboard.css";
+import CustomCard from "../../components/customeCard";
+import { FaBookOpen, FaUser, FaLeaf } from "react-icons/fa";
+import CustomInfoCard from "../../components/customInfoCard";
 
-const Dashboard = () => {
-
-
+const DashboardAdmin = () => {
   return (
     <div className="dashboard-container">
       <Sidebar />
@@ -24,19 +21,21 @@ const Dashboard = () => {
             }}
           >
             <CustomInfoCard
-              icon={<FaBookOpen />}
-              title="Your Borrowed Book List"
+              icon={<FaUser />}
+              title=""
+              subtitle="Total User Based"
               to="/catalog"
             />
             <CustomInfoCard
-              icon={<GiReturnArrow />}
-              title="Your Returned Book List"
+              icon={<FaBookOpen />}
+              title=""
+              subtitle="Total Book count"
               to="/catalog?tab=completed"
             />
             <CustomInfoCard
-              icon={<GiWhiteBook />}
-              title="Book Name : The Great Gatsby"
-              subtitle="Time Remaining : 2 Days"
+              icon={<FaLeaf />}
+              title=""
+              subtitle="Total Catalog count"
               to="/catalog"
             />
           </div>
@@ -49,8 +48,9 @@ const Dashboard = () => {
             <div style={{ padding: "50px" }}>
               <CustomCard label="~ ReadSphere Team">
                 <p>
-                  "Embarking on the journey of reading cultivates personal growth,
-                  paving the way to excellence and the enrichment of character."
+                  "Embarking on the journey of reading cultivates personal
+                  growth, paving the way to excellence and the enrichment of
+                  character."
                 </p>
               </CustomCard>
             </div>
@@ -61,4 +61,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardAdmin;
