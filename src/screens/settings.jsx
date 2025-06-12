@@ -15,7 +15,7 @@ const Settings = ({ onClose }) => {
 
   return (
     <div className="change-credentials-container">
-      <div className="header">
+      <div className="headerSetting">
         <div className="icon-box">
           <FaCog size={28} />
         </div>
@@ -27,8 +27,8 @@ const Settings = ({ onClose }) => {
 
       <hr className="gold-line" />
 
-      <div className="form">
-        <div className="form-row">
+      <div className="formSetting">
+        <div className="form-rowSetting">
           <label>Enter Current Password</label>
           <input
             type="password"
@@ -38,7 +38,7 @@ const Settings = ({ onClose }) => {
           />
         </div>
 
-        <div className="form-row">
+        <div className="form-rowSetting">
           <label>Enter New Password</label>
           <input
             type="password"
@@ -48,7 +48,7 @@ const Settings = ({ onClose }) => {
           />
         </div>
 
-        <div className="form-row">
+        <div className="form-rowSetting">
           <label>Confirm New Password</label>
           <input
             type="password"
