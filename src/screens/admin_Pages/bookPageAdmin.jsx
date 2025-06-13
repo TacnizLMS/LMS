@@ -4,6 +4,7 @@ import {
   updateBook,
   availabilityToString,
   addBook,
+  deleteBook
 } from "../../services/bookService";
 import BookTable from "../../components/bookTableAdmin";
 import Sidebar from "../../components/sideBar";
@@ -112,6 +113,19 @@ const BooksPageAdmin = () => {
     }
   };
 
+  const handleDeleteBook = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this book?")) return;
+
+  try {
+    await deleteBook(id);
+    setBooks((prevBooks) => prevBooks.filter((book) => book.id !== id));
+  } catch (error) {
+    console.error("Failed to delete book:", error);
+    alert("Failed to delete book. Please try again.");
+  }
+};
+
+
   return (
     <div className="library-page">
       <Sidebar />
@@ -125,7 +139,7 @@ const BooksPageAdmin = () => {
           <div style={{ marginTop: "20px" }}></div>
         </div>
 
-        <BookTable books={books} onEditBook={handleEditBook} />
+        <BookTable books={books} onEditBook={handleEditBook} onDeleteBook={handleDeleteBook} />
 
         {/* Add Book Modal */}
         {showAddModal && (

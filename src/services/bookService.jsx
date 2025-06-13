@@ -275,6 +275,29 @@ export const addBook = async (newBook) => {
   }
 };
 
+export const deleteBook = async (id) => {
+  const token = sessionStorage.getItem("jwt"); // same as other functions
+  if (!token) {
+    throw new Error("No auth token found, cannot delete book");
+  }
+
+  const bearerToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+
+  const response = await fetch(`http://localhost:8080/api/books/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": bearerToken,
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to delete book: ${errorText}`);
+  }
+
+  return true;
+};
+
 
 
 // Export helper functions for use in components

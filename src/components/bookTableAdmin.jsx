@@ -1,7 +1,7 @@
 // components/bookTableAdmin.js
 import React from "react";
 
-const BookTableAdmin = ({ books, onEditBook }) => {
+const BookTableAdmin = ({ books, onEditBook, onDeleteBook }) => {
   // Helper function to safely render values
   const safeRender = (value) => {
     if (value === null || value === undefined) {
@@ -86,7 +86,7 @@ const BookTableAdmin = ({ books, onEditBook }) => {
                       marginRight: 8,
                       color: "black",
                     }}
-                    onClick={() => alert(`Delete book ${safeRender(book.id)}`)}
+onClick={() => onDeleteBook(book.id)}
                   >
                     <svg
                       width="18"
