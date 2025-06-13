@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import "../styling/Sidebar.css";
 import {
   FaBook,
-  FaUser,
+  FaUsers,
   FaHome,
   FaMoneyBill,
   FaSignOutAlt,
@@ -16,13 +16,27 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
 
+  //  // Get user role from localStorage 
+  // const getUserRole = () => {
+  //   return sessionStorage.getItem("role"); 
+  // };
+
+  // if (getUserRole()==="User") {
+  //   return null; 
+  // }
+
   const menuItems = [
     { name: "Dashboard", icon: <FaHome />, path: "/dashboard" },
     { name: "Catalog", icon: <FaLeaf />, path: "/catalog" },
     { name: "Books", icon: <FaBook />, path: "/books" },
     // To do: add user role based access control
-    { name: "Users", icon: <FaUser />, path: "/users" },
     { name: "Fine", icon: <FaMoneyBill />, path: "/fine" },
+    { name: "Admin Dashboard", icon: <FaHome />, path: "/admin-dashboard" },
+    { name: "Catalog Admin", icon: <FaLeaf />, path: "/catalog-admin" },
+    { name: "Books Admin", icon: <FaBook />, path: "/books-admin" },
+        { name: "Users", icon: <FaUsers />, path: "/users" },
+
+
   ];
 
   return (
