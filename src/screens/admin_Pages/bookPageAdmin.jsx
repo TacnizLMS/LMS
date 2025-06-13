@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { fetchBooks } from "../../services/bookService";
+import {
+  fetchBooks,
+  updateBook,
+  availabilityToString,
+  addBook,
+} from "../../services/bookService";
 import BookTable from "../../components/bookTableAdmin";
 import Sidebar from "../../components/sideBar";
 import AppBar from "../../components/appBar";
@@ -8,6 +13,9 @@ import "../../styling/book.css";
 const BooksPageAdmin = () => {
   const [books, setBooks] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingBook, setEditingBook] = useState(null);
+  const [originalBook, setOriginalBook] = useState(null);
   const [newBook, setNewBook] = useState({
     name: "",
     category: "",
@@ -17,24 +25,91 @@ const BooksPageAdmin = () => {
     availability: "Available",
   });
 
+  const transformBookForUI = (book) => {
+    return {
+      id: book.id,
+      name: book.title || "Untitled",
+      category: book.author || "Unknown Author",
+      type:
+        book.type?.name ||
+        (typeof book.type === "string" ? book.type : "Unknown"),
+      language: book.language,
+      quantity: book.quantity || 0,
+      availability: availabilityToString(book.availability),
+      availabilityBoolean: book.availability,
+    };
+  };
+
   useEffect(() => {
     fetchBooks().then(setBooks).catch(console.error);
   }, []);
 
-  const handleAddBook = () => {
-    // This should ideally call your backend to save the book.
-    const newId = Math.max(...books.map((b) => b.id)) + 1;
-    const bookWithId = { ...newBook, id: newId };
-    setBooks((prev) => [...prev, bookWithId]);
-    setShowAddModal(false);
-    setNewBook({
-      name: "",
-      category: "",
-      type: "",
-      language: "",
-      quantity: 1,
-      availability: "Available",
+  // Function to get only the changed fields
+  const getChangedFields = (original, updated) => {
+    const changes = {};
+
+    Object.keys(updated).forEach((key) => {
+      if (original[key] !== updated[key]) {
+        changes[key] = updated[key];
+      }
     });
+
+    return changes;
+  };
+
+  // Handle edit book click
+  const handleEditBook = (book) => {
+    setEditingBook({ ...book });
+    setOriginalBook({ ...book });
+    setShowEditModal(true);
+  };
+
+  // Handle save edited book
+  const handleSaveEditedBook = async () => {
+    try {
+      const changedFields = getChangedFields(originalBook, editingBook);
+
+      // Always send these two fields
+      changedFields.availability = editingBook.availability;
+      changedFields.availabilityBoolean =
+        editingBook.availability === "Available";
+
+      const updatedBook = await updateBook(editingBook.id, changedFields);
+
+      const transformedBook = transformBookForUI(updatedBook);
+
+      setBooks((prevBooks) =>
+        prevBooks.map((book) =>
+          book.id === editingBook.id ? transformedBook : book
+        )
+      );
+
+      setShowEditModal(false);
+      setEditingBook(null);
+      setOriginalBook(null);
+    } catch (error) {
+      console.error("Failed to update book:", error);
+      alert("Failed to update book. Please try again.");
+    }
+  };
+
+  const handleAddBook = async () => {
+    try {
+      const createdBook = await addBook(newBook);
+
+      setBooks((prev) => [...prev, createdBook]);
+      setShowAddModal(false);
+      setNewBook({
+        name: "",
+        category: "",
+        // type: "",
+        language: "",
+        quantity: 1,
+      });
+    } catch (error) {
+      console.error("Failed to add book:", error);
+      alert("Failed to add book. Please try again.");
+    }
   };
 
   return (
@@ -50,7 +125,7 @@ const BooksPageAdmin = () => {
           <div style={{ marginTop: "20px" }}></div>
         </div>
 
-        <BookTable books={books} />
+        <BookTable books={books} onEditBook={handleEditBook} />
 
         {/* Add Book Modal */}
         {showAddModal && (
@@ -75,7 +150,7 @@ const BooksPageAdmin = () => {
                   }
                 />
               </label>
-              <label>
+              {/* <label>
                 Type:{" "}
                 <input
                   value={newBook.type}
@@ -83,7 +158,8 @@ const BooksPageAdmin = () => {
                     setNewBook({ ...newBook, type: e.target.value })
                   }
                 />
-              </label>
+              </label> */}
+
               <label>
                 Quantity:{" "}
                 <input
@@ -92,11 +168,12 @@ const BooksPageAdmin = () => {
                   onChange={(e) =>
                     setNewBook({
                       ...newBook,
-                      quantity: parseInt(e.target.value),
+                      quantity: e.target.value, // store as string
                     })
                   }
                 />
               </label>
+
               <div className="form-field">
                 <label>
                   Language:
@@ -114,7 +191,7 @@ const BooksPageAdmin = () => {
                   </select>
                 </label>
 
-                <label>
+                {/* <label>
                   Availability:
                   <select
                     value={newBook.availability}
@@ -125,17 +202,132 @@ const BooksPageAdmin = () => {
                     <option>Available</option>
                     <option>Not Available</option>
                   </select>
+                </label> */}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "20px",
+                }}
+              >
+                <button onClick={() => setShowAddModal(false)}>Cancel</button>
+                <button onClick={handleAddBook} style={{ marginLeft: "auto" }}>
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Book Modal */}
+        {showEditModal && editingBook && (
+          <div className="modal-overlayBook">
+            <div className="modal-contentBook">
+              <h2>Edit Book</h2>
+              <label>
+                Title:{" "}
+                <input
+                  value={editingBook.name}
+                  onChange={(e) =>
+                    setEditingBook({
+                      ...editingBook,
+                      name: e.target.value,
+                      availabilityBoolean: e.target.value === "Available",
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Author:{" "}
+                <input
+                  value={editingBook.category}
+                  onChange={(e) =>
+                    setEditingBook({ ...editingBook, category: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Type:{" "}
+                <input
+                  value={editingBook.type}
+                  onChange={(e) =>
+                    setEditingBook({ ...editingBook, type: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Quantity:{" "}
+                <input
+                  type="number"
+                  value={editingBook.quantity ?? ""}
+                  onChange={(e) =>
+                    setEditingBook({
+                      ...editingBook,
+                      quantity: e.target.value, // don't parse yet
+                    })
+                  }
+                />
+              </label>
+
+              <div className="form-field">
+                <label>
+                  Language:
+                  <br />
+                  <select
+                    value={editingBook.language}
+                    onChange={(e) =>
+                      setEditingBook({
+                        ...editingBook,
+                        language: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Select Language</option>
+                    <option value="English">English</option>
+                    <option value="Sinhala">Sinhala</option>
+                    <option value="Tamil">Tamil</option>
+                  </select>
+                </label>
+
+                <label>
+                  Availability:
+                  <select
+                    value={editingBook.availability}
+                    onChange={(e) =>
+                      setEditingBook({
+                        ...editingBook,
+                        availability: e.target.value,
+                      })
+                    }
+                  >
+                    <option>Available</option>
+                    <option>Not Available</option>
+                  </select>
                 </label>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
-                 <button
-                  onClick={() => setShowAddModal(false)}
-                  
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "20px",
+                }}
+              >
+                <button
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingBook(null);
+                    setOriginalBook(null);
+                  }}
                 >
                   Cancel
                 </button>
-                <button onClick={handleAddBook} style={{ marginLeft: "auto" }}>Save</button>
-               
+                <button
+                  onClick={handleSaveEditedBook}
+                  style={{ marginLeft: "auto" }}
+                >
+                  Update
+                </button>
               </div>
             </div>
           </div>

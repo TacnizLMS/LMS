@@ -1,7 +1,19 @@
-// components/bookTable.js
+// components/bookTableAdmin.js
 import React from "react";
 
-const BookTableAdmin = ({ books }) => {
+const BookTableAdmin = ({ books, onEditBook }) => {
+  // Helper function to safely render values
+  const safeRender = (value) => {
+    if (value === null || value === undefined) {
+      return 'N/A';
+    }
+    if (typeof value === 'object') {
+      // If it's an object, try to extract meaningful info or stringify it
+      return value.name || value.title || JSON.stringify(value) || 'Unknown';
+    }
+    return String(value);
+  };
+
   return (
     <div className="table-wrapper">
       <table className="books-table">
@@ -21,12 +33,12 @@ const BookTableAdmin = ({ books }) => {
           {books && books.length > 0 ? (
             books.map((book) => (
               <tr key={book.id}>
-                <td>{book.id}</td>
-                <td>{book.name}</td>
-                <td>{book.category}</td>
-                <td>{book.type}</td>
-                <td>{book.language}</td>
-                <td>{book.quantity}</td>
+                <td>{safeRender(book.id)}</td>
+                <td>{safeRender(book.name)}</td>
+                <td>{safeRender(book.category)}</td>
+                <td>{safeRender(book.type)}</td>
+                <td>{safeRender(book.language)}</td>
+                <td>{safeRender(book.quantity)}</td>
                 <td>
                   <span
                     className={`availability-status ${
@@ -35,7 +47,7 @@ const BookTableAdmin = ({ books }) => {
                         : "not-available"
                     }`}
                   >
-                    {book.availability}
+                    {safeRender(book.availability)}
                   </span>
                 </td>
 
@@ -49,7 +61,7 @@ const BookTableAdmin = ({ books }) => {
                       marginRight: 8,
                       color: "black",
                     }}
-                    onClick={() => alert(`Edit book ${book.id}`)}
+                    onClick={() => onEditBook && onEditBook(book)}
                   >
                     <svg
                       width="18"
@@ -74,7 +86,7 @@ const BookTableAdmin = ({ books }) => {
                       marginRight: 8,
                       color: "black",
                     }}
-                    onClick={() => alert(`Delete book ${book.id}`)}
+                    onClick={() => alert(`Delete book ${safeRender(book.id)}`)}
                   >
                     <svg
                       width="18"
@@ -87,7 +99,7 @@ const BookTableAdmin = ({ books }) => {
                       strokeLinejoin="round"
                     >
                       <polyline points="3 6 5 6 21 6" />
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2 2h2a2 2 0 0 1 2 2v2" />
                       <line x1="10" y1="11" x2="10" y2="17" />
                       <line x1="14" y1="11" x2="14" y2="17" />
                     </svg>
@@ -100,7 +112,7 @@ const BookTableAdmin = ({ books }) => {
                       cursor: "pointer",
                       color: "black",
                     }}
-                    onClick={() => alert(`Book info for ${book.id}`)}
+                    onClick={() => alert(`Book info for ${safeRender(book.id)}`)}
                   >
                     <svg
                       width="18"
@@ -123,7 +135,7 @@ const BookTableAdmin = ({ books }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="9" style={{ textAlign: "center" }}>
+              <td colSpan="8" style={{ textAlign: "center" }}>
                 No records found
               </td>
             </tr>
