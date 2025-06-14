@@ -164,56 +164,75 @@ export const fetchAllCatalogs = async () => {
   }
 };
 
-// Function to delete a catalog by id
-export const deleteCatalog = async (catalogId) => {
+
+
+
+export const updateCatalog = async (catalogId, books) => {
   try {
-    const url = `${API_BASE_URL}/catalog/delete/${catalogId}`;
-    console.log('Deleting catalog at:', url);
+    const url = `${API_BASE_URL}/catalog/update/${catalogId}`;
+    console.log('Updating catalog at:', url);
 
     const token = getAuthToken();
-    console.log('Using token for deleteCatalog:', token ? `${token.substring(0, 20)}...` : 'No token found');
+    console.log('Using token:', token ? `${token.substring(0, 20)}...` : 'No token found');
 
-    const headers = {};
+    // Prepare headers with proper authorization
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    
     if (token) {
-      headers['Authorization'] = token;
+      // Add Bearer prefix if token doesn't already have it
+      headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
     }
 
+    console.log('Request headers:', headers);
+
+    // Use the prepared headers in the actual fetch request
     const response = await fetch(url, {
-      method: 'DELETE',
-      headers,
+      method: 'PUT',
+      headers: headers, // Use the prepared headers object
+      body: JSON.stringify({ books }),
     });
-
-    console.log('Delete response status:', response.status);
-
-    if (response.status === 403) {
-      const errorText = await response.text();
-      console.log('403 Error response body:', errorText);
-      throw new Error(`Access denied. Server response: ${errorText}`);
-    }
-
-    if (response.status === 401) {
-      const errorText = await response.text();
-      console.log('401 Error response body:', errorText);
-      throw new Error(`Unauthorized. Server response: ${errorText}`);
-    }
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.log('Error response body:', errorText);
-      throw new Error(`Failed to delete catalog. Status: ${response.status}, Message: ${errorText}`);
+      console.error('Server response:', response.status, response.statusText, errorText);
+      throw new Error(`Failed to update catalog: ${response.status} ${response.statusText}`);
     }
 
-    // If expect a JSON response confirming deletion:
-    // const data = await response.json();
-    // console.log('Catalog deleted successfully:', data);
-    // return data;
-
-    // if no response body, just return true:
-    console.log('Catalog deleted successfully');
-    return true;
-
+    const result = await response.json();
+    console.log('Catalog updated successfully:', result);
+    return result;
   } catch (error) {
-    console.error('Error in deleteCatalog:', error);
+    console.error('Error updating catalog:', error);
     throw error;
+  }
+};
+
+
+export const deleteCatalogById = async (catalogId) => {
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/catalog/delete/${catalogId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Server error: ${errorText}`);
+    }
+
+    return await response.text();
+  } catch (err) {
+    console.error('Delete catalog error:', err);
+    throw err;
   }
 };
