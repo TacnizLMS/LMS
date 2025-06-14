@@ -163,3 +163,76 @@ export const fetchAllCatalogs = async () => {
     throw error;
   }
 };
+
+
+
+
+export const updateCatalog = async (catalogId, books) => {
+  try {
+    const url = `${API_BASE_URL}/catalog/update/${catalogId}`;
+    console.log('Updating catalog at:', url);
+
+    const token = getAuthToken();
+    console.log('Using token:', token ? `${token.substring(0, 20)}...` : 'No token found');
+
+    // Prepare headers with proper authorization
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      // Add Bearer prefix if token doesn't already have it
+      headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    }
+
+    console.log('Request headers:', headers);
+
+    // Use the prepared headers in the actual fetch request
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: headers, // Use the prepared headers object
+      body: JSON.stringify({ books }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Server response:', response.status, response.statusText, errorText);
+      throw new Error(`Failed to update catalog: ${response.status} ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    console.log('Catalog updated successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('Error updating catalog:', error);
+    throw error;
+  }
+};
+
+
+export const deleteCatalogById = async (catalogId) => {
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/catalog/delete/${catalogId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Server error: ${errorText}`);
+    }
+
+    return await response.text();
+  } catch (err) {
+    console.error('Delete catalog error:', err);
+    throw err;
+  }
+};

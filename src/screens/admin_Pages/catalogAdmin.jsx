@@ -3,8 +3,8 @@ import Sidebar from "../../components/sideBar";
 import AppBar from "../../components/appBar";
 import "../../styling/catalog.css";
 import { useLocation } from "react-router-dom";
-import { fetchAllCatalogs } from "../../services/catalogService";
-import { FaEdit } from "react-icons/fa";
+import { fetchAllCatalogs, updateCatalog,deleteCatalogById } from "../../services/catalogService";
+import { FaEdit, FaTrash, FaUndo } from "react-icons/fa";
 
 const CatalogAdmin = () => {
   const [catalogs, setCatalogs] = useState([]);
@@ -18,6 +18,7 @@ const CatalogAdmin = () => {
     catalogId: null,
     bookId: null,
   });
+  const [deletingItems, setDeletingItems] = useState(new Set());
 
   const location = useLocation();
 
@@ -32,6 +33,58 @@ const CatalogAdmin = () => {
     return sessionStorage.getItem("userId");
   };
 
+
+  // Return all books in a catalog
+  const returnAllBooks = async (catalogId) => {
+    try {
+      const catalog = catalogs.find(c => c.id === catalogId);
+      if (!catalog) return;
+
+      // Prepare data for all unreturned books
+      const booksToReturn = catalog.catalogBooks
+        .filter(book => !book.returnState)
+        .map(book => ({
+          bookId: book.book.id,
+          quantity: 1,
+          returnState: true
+        }));
+
+      if (booksToReturn.length === 0) {
+        alert('All books in this catalog are already returned.');
+        return;
+      }
+
+      console.log('Returning all books:', booksToReturn);
+
+      // Call the API to update all books
+      await updateCatalog(catalogId, booksToReturn);
+
+      // Update local state
+      setCatalogs(prevCatalogs =>
+        prevCatalogs.map(catalog => {
+          if (catalog.id !== catalogId) return catalog;
+
+          const updatedBooks = catalog.catalogBooks.map(book => ({
+            ...book,
+            returnState: true
+          }));
+
+          return {
+            ...catalog,
+            catalogBooks: updatedBooks,
+            completeState: true
+          };
+        })
+      );
+
+      alert(`Successfully returned ${booksToReturn.length} books.`);
+      
+    } catch (error) {
+      console.error('Failed to return all books:', error);
+      alert('Failed to return all books. Please try again.');
+    }
+  };
+
   useEffect(() => {
     const loadCatalogs = async () => {
       setLoading(true);
@@ -40,7 +93,7 @@ const CatalogAdmin = () => {
         const userId = getUserId();
         console.log("Fetching catalogs for user:", userId);
 
-        const data = await fetchAllCatalogs(); // ✅ Now clearly the imported one
+        const data = await fetchAllCatalogs(); 
         console.log("Fetched catalog data:", data);
 
         const catalogsArray = Array.isArray(data) ? data : [data];
@@ -117,23 +170,108 @@ const CatalogAdmin = () => {
   const filteredCatalogs = getFilteredCatalogs();
   const catalogCounts = getCatalogCounts();
 
-  const handleReturnChange = (catalogId, bookId, newReturnState) => {
-    setCatalogs((prevCatalogs) =>
-      prevCatalogs.map((catalog) => {
-        if (catalog.id !== catalogId) return catalog;
+  const handleReturnChange = async (catalogId, bookId, newReturnState) => {
+    try {
+      console.log('handleReturnChange called with:', { catalogId, bookId, newReturnState });
+      
+      // Find the catalog and the specific book
+      const catalog = catalogs.find(c => c.id === catalogId);
+      if (!catalog) {
+        console.error('Catalog not found:', catalogId);
+        return;
+      }
 
-        const updatedBooks = catalog.catalogBooks.map((book) => {
-          if (book.id !== bookId) return book;
-          return { ...book, returnState: newReturnState === "yes" };
-        });
+      const catalogBook = catalog.catalogBooks.find(item => item.id === bookId);
+      if (!catalogBook) {
+        console.error('Book not found in catalog:', bookId);
+        return;
+      }
 
-        return { ...catalog, catalogBooks: updatedBooks };
-      })
-    );
+      // Convert the return state to boolean
+      const returnState = newReturnState === "returned";
+      console.log('Setting returnState to:', returnState);
 
-    // Exit edit mode after change
-    setEditingReturn({ catalogId: null, bookId: null });
+      // Prepare the book data for API call
+      const books = [{
+        bookId: catalogBook.book.id,
+        quantity: 1,
+        returnState: returnState // Make sure to include the return state in the API call
+      }];
+
+      console.log('Updating book with data:', books);
+
+      // Call the API to update the book
+      await updateCatalog(catalogId, books);
+
+      // Update local state for the specific book
+      setCatalogs((prevCatalogs) =>
+        prevCatalogs.map((catalog) => {
+          if (catalog.id !== catalogId) return catalog;
+
+          const updatedBooks = catalog.catalogBooks.map((book) => {
+            if (book.id !== bookId) return book;
+            console.log(`Updating book ${bookId} returnState from ${book.returnState} to ${returnState}`);
+            return { ...book, returnState: returnState };
+          });
+
+          // Check if all books are now returned to update completeState
+          const allReturned = updatedBooks.every(book => book.returnState);
+          console.log('All books returned?', allReturned);
+          
+          return { 
+            ...catalog, 
+            catalogBooks: updatedBooks,
+            completeState: allReturned
+          };
+        })
+      );
+
+      // Exit edit mode after successful change
+      setEditingReturn({ catalogId: null, bookId: null });
+      console.log('Return state updated successfully');
+      
+    } catch (error) {
+      console.error('Failed to update return state:', error);
+      alert('Failed to update return state. Please try again.');
+      
+      // Reset editing state even on error to prevent getting stuck in edit mode
+      setEditingReturn({ catalogId: null, bookId: null });
+    }
   };
+
+const handleDeleteCatalog = async (catalogId) => {
+  try {
+    setDeletingItems(prev => new Set(prev).add(`catalog-${catalogId}`));
+
+    const catalog = catalogs.find(c => c.id === catalogId);
+    if (!catalog) {
+      throw new Error('Catalog not found');
+    }
+
+    // Check for unreturned books
+    const unreturnedBooks = catalog.catalogBooks.filter(book => !book.returnState);
+    if (unreturnedBooks.length > 0) {
+      alert(`Cannot delete catalog with unreturned books`);
+      return;
+    }
+
+    console.log('Attempting to delete catalog:', catalogId);
+    
+    await deleteCatalogById(catalogId);
+    
+    setCatalogs(prev => prev.filter(c => c.id !== catalogId));
+    alert('Catalog deleted successfully!');
+  } catch (error) {
+    console.error('Delete catalog failed:', error);
+    alert(`Delete failed: ${error.message}`);
+  } finally {
+    setDeletingItems(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(`catalog-${catalogId}`);
+      return newSet;
+    });
+  }
+};
 
   return (
     <div className="library-page">
@@ -212,6 +350,38 @@ const CatalogAdmin = () => {
                           </p>
                         )}
                       </div>
+                      <div className="catalog-actions">
+                        {/* Return All Button - only show for active/expired catalogs with unreturned books */}
+                        {(activeTab === "active" || activeTab === "expired") && 
+                         catalog.catalogBooks.some(book => !book.returnState) && (
+                          <button
+                            className="return-all-btn"
+                            onClick={() => returnAllBooks(catalog.id)}
+                            title="Return all books in this catalog"
+                          >
+                            <FaUndo /> Return All
+                          </button>
+                        )}
+                        
+                        {/* Delete Catalog Button */}
+                    {activeTab === "completed" && (
+  <button
+    className="delete-catalog-btn"
+    onClick={() => {
+      if (window.confirm('Are you sure you want to delete this entire catalog? This action cannot be undone.')) {
+        handleDeleteCatalog(catalog.id);
+      }
+    }}
+    disabled={deletingItems.has(`catalog-${catalog.id}`)}
+    title="Delete entire catalog"
+  >
+    <FaTrash />
+    {deletingItems.has(`catalog-${catalog.id}`) ? 'Deleting...' : 'Delete Catalog'}
+  </button>
+)}
+
+
+                      </div>
                     </div>
 
                     <div className="books-list">
@@ -237,130 +407,151 @@ const CatalogAdmin = () => {
                                 <td>{item.book.author}</td>
                                 <td>{item.book.type.name}</td>
                                 <td
-                                  className={item.fine > 0 ? "fine-amount" : ""}
+                                  className={item.fine > 0 ? "fine-amounttab" : ""}
                                 >
                                   ${item.fine.toFixed(2)}
                                 </td>
                                 <td>
-                                  {editingFine.catalogId === catalog.id &&
-                                  editingFine.bookId === item.id ? (
-                                    <select
-                                      value={item.finePaid ? "yes" : "no"}
-                                      onChange={(e) => {
-                                        const newFinePaid =
-                                          e.target.value === "yes";
-                                        setCatalogs((prevCatalogs) =>
-                                          prevCatalogs.map((c) =>
-                                            c.id === catalog.id
-                                              ? {
-                                                  ...c,
-                                                  catalogBooks:
-                                                    c.catalogBooks.map((b) =>
-                                                      b.id === item.id
-                                                        ? {
-                                                            ...b,
-                                                            finePaid:
-                                                              newFinePaid,
-                                                          }
-                                                        : b
-                                                    ),
-                                                }
-                                              : c
-                                          )
-                                        );
-                                            setEditingFine({ catalogId: null, bookId: null });
-
-                                      }}
-                                      onBlur={() =>
-                                        setEditingReturn({
-                                          catalogId: null,
-                                          bookId: null,
-                                        })
-                                      }
-                                      autoFocus
-                                    >
-                                      <option value="yes">Paid</option>
-                                      <option value="no">Unpaid</option>
-                                    </select>
-                                  ) : (
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "6px",
-                                      }}
-                                    >
-                                      <span
-                                        className={`status-indicator ${
-                                          item.finePaid ? "paid" : "unpaid"
-                                        }`}
-                                      >
-                                        {item.finePaid ? "Paid" : "Unpaid"}
-                                      </span>
-                                      <FaEdit
-                                        className="edit-icon"
-                                        onClick={() =>
-                                          setEditingFine({
-                                            catalogId: catalog.id,
-                                            bookId: item.id,
+                                  {activeTab === "expired" ? (
+                                    editingFine.catalogId === catalog.id &&
+                                    editingFine.bookId === item.id ? (
+                                      <select
+                                        value={item.finePaid ? "yes" : "no"}
+                                        onChange={(e) => {
+                                          const newFinePaid =
+                                            e.target.value === "yes";
+                                          setCatalogs((prevCatalogs) =>
+                                            prevCatalogs.map((c) =>
+                                              c.id === catalog.id
+                                                ? {
+                                                    ...c,
+                                                    catalogBooks:
+                                                      c.catalogBooks.map((b) =>
+                                                        b.id === item.id
+                                                          ? {
+                                                              ...b,
+                                                              finePaid:
+                                                                newFinePaid,
+                                                            }
+                                                          : b
+                                                      ),
+                                                  }
+                                                : c
+                                            )
+                                          );
+                                          setEditingFine({ catalogId: null, bookId: null });
+                                        }}
+                                        onBlur={() =>
+                                          setEditingReturn({
+                                            catalogId: null,
+                                            bookId: null,
                                           })
                                         }
-                                      />
-                                    </div>
+                                        autoFocus
+                                      >
+                                        <option value="yes">Paid</option>
+                                        <option value="no">Unpaid</option>
+                                      </select>
+                                    ) : (
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          gap: "6px",
+                                        }}
+                                      >
+                                        <span
+                                          className={`status-indicator ${
+                                            item.finePaid ? "paid" : "unpaid"
+                                          }`}
+                                        >
+                                          {item.finePaid ? "Paid" : "Unpaid"}
+                                        </span>
+                                        <FaEdit
+                                          className="edit-icon"
+                                          onClick={() =>
+                                            setEditingFine({
+                                              catalogId: catalog.id,
+                                              bookId: item.id,
+                                            })
+                                          }
+                                        />
+                                      </div>
+                                    )
+                                  ) : (
+                                    <span
+                                      className={`status-indicator ${
+                                        item.finePaid ? "paid" : "unpaid"
+                                      }`}
+                                    >
+                                      {item.finePaid ? "Paid" : "Unpaid"}
+                                    </span>
                                   )}
                                 </td>
 
                                 <td>
-                                  {editingReturn.catalogId === catalog.id &&
-                                  editingReturn.bookId === item.id ? (
-                                    <select
-                                      value={item.returnState ? "yes" : "no"}
-                                      onChange={(e) =>
-                                        handleReturnChange(
-                                          catalog.id,
-                                          item.id,
-                                          e.target.value
-                                        )
-                                      }
-                                      onBlur={() =>
-                                        setEditingReturn({
-                                          catalogId: null,
-                                          bookId: null,
-                                        })
-                                      }
-                                      autoFocus
-                                    >
-                                      <option value="yes">Yes</option>
-                                      <option value="no">No</option>
-                                    </select>
-                                  ) : (
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "15px",
-                                      }}
-                                    >
-                                      <span
-                                        className={`status-indicator ${
-                                          item.returnState
-                                            ? "returned"
-                                            : "not-returned"
-                                        }`}
-                                      >
-                                        {item.returnState ? "Yes" : "No"}
-                                      </span>
-
-                                      <FaEdit
-                                        className="edit-icon"
-                                        onClick={() =>
+                                  {activeTab === "expired" || activeTab === "active" ? (
+                                    editingReturn.catalogId === catalog.id &&
+                                    editingReturn.bookId === item.id ? (
+                                      <select
+                                        value={item.returnState ? "returned" : "not-returned"}
+                                        onChange={(e) =>
+                                          handleReturnChange(
+                                            catalog.id,
+                                            item.id,
+                                            e.target.value
+                                          )
+                                        }
+                                        onBlur={() =>
                                           setEditingReturn({
-                                            catalogId: catalog.id,
-                                            bookId: item.id,
+                                            catalogId: null,
+                                            bookId: null,
                                           })
                                         }
-                                      />
-                                    </div>
+                                        autoFocus
+                                      >
+                                        <option value="returned">Returned</option>
+                                        <option value="not-returned">Not Returned</option>
+                                      </select>
+                                    ) : (
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          gap: "15px",
+                                        }}
+                                      >
+                                        <span
+                                          className={`status-indicator ${
+                                            item.returnState
+                                              ? "returned"
+                                              : "not-returned"
+                                          }`}
+                                        >
+                                          {item.returnState ? "Returned" : "Not Returned"}
+                                        </span>
+
+                                        <FaEdit
+                                          className="edit-icon"
+                                          onClick={() =>
+                                            setEditingReturn({
+                                              catalogId: catalog.id,
+                                              bookId: item.id,
+                                            })
+                                          }
+                                        />
+                                      </div>
+                                    )
+                                  ) : (
+                                    <span
+                                      className={`status-indicator ${
+                                        item.returnState
+                                          ? "returned"
+                                          : "not-returned"
+                                      }`}
+                                    >
+                                      {item.returnState ? "Returned" : "Not Returned"}
+                                    </span>
                                   )}
                                 </td>
                               </tr>

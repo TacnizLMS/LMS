@@ -2,6 +2,15 @@
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
+// Helper functions for availability conversion
+const availabilityToString = (booleanValue) => {
+  return booleanValue ? 'Available' : 'Not Available';
+};
+
+const availabilityToBoolean = (stringValue) => {
+  return stringValue === 'Available';
+};
+
 // Debug function to check all possible token locations
 const getAuthToken = () => {
   const possibleTokens = {
@@ -18,7 +27,6 @@ const getAuthToken = () => {
   return rawToken.startsWith("Bearer ") ? rawToken : `Bearer ${rawToken}`;
 };
 
-
 export const fetchBooks = async () => {
   try {
     console.log('Fetching books from:', `${API_BASE_URL}/books`);
@@ -32,7 +40,7 @@ export const fetchBooks = async () => {
     
     // Try different authorization header formats
     if (token) {
-headers['Authorization'] = token;
+      headers['Authorization'] = token;
     }
     
     console.log('Request headers:', headers);
@@ -45,7 +53,7 @@ headers['Authorization'] = token;
     console.log('Response status:', response.status);
     console.log('Response headers:', Object.fromEntries(response.headers.entries()));
     console.log('Final request to:', `${API_BASE_URL}/books`);
-console.log('Headers sent:', headers);
+    console.log('Headers sent:', headers);
 
     
     if (response.status === 403) {
@@ -69,15 +77,16 @@ console.log('Headers sent:', headers);
     const data = await response.json();
     console.log('Raw API response:', data);
     
-    // Transform the data
+    // Transform the data - convert boolean availability to string for UI display
     const transformedData = data.map(book => ({
       id: book.id,
-      name: book.title,
-      category: book.author,
-      type: book.type?.name || 'Unknown',
-      language: 'English',
-      quantity: book.quantity,
-      availability: book.availability ? 'Available' : 'Not Available'
+      name: book.title || 'Untitled',
+      category: book.author || 'Unknown Author',
+      type: book.type?.name || (typeof book.type === 'string' ? book.type : 'Unknown'),
+      language: book.language,
+      quantity: book.quantity || 0,
+      availability: availabilityToString(book.availability), // Convert boolean to string for UI
+      availabilityBoolean: book.availability // Keep original boolean for reference
     }));
     
     console.log('Transformed data:', transformedData);
@@ -109,12 +118,13 @@ export const fetchBooksWithCredentials = async (username, password) => {
     const data = await response.json();
     return data.map(book => ({
       id: book.id,
-      name: book.title,
-      category: book.author,
-      type: book.type?.name || 'Unknown',
-      language: 'English',
-      quantity: book.quantity,
-      availability: book.availability ? 'Available' : 'Not Available'
+      name: book.title || 'Untitled',
+      category: book.author || 'Unknown Author',
+      type: book.type?.name || (typeof book.type === 'string' ? book.type : 'Unknown'),
+      language: book.language,
+      quantity: book.quantity || 0,
+      availability: availabilityToString(book.availability), // Convert boolean to string for UI
+      availabilityBoolean: book.availability
     }));
     
   } catch (error) {
@@ -122,3 +132,173 @@ export const fetchBooksWithCredentials = async (username, password) => {
     throw error;
   }
 };
+
+export const updateBook = async (bookId, updatedFields) => {
+ 
+
+  try {
+    const token = getAuthToken();
+    console.log('Updating book with ID:', bookId);
+    console.log('Updated fields:', updatedFields);
+    
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Add authorization header if token exists
+    if (token) {
+      headers['Authorization'] = token;
+    }
+    
+    // Transform the data for API - convert availability string back to boolean
+    const apiData = { ...updatedFields };
+    
+    
+    // Convert availability string to boolean for API
+    if (apiData.availability !== undefined) {
+      if (typeof apiData.availability === 'string') {
+        // Convert "Available" to true, "Not Available" to false
+        apiData.availability = availabilityToBoolean(apiData.availability);
+      }
+      // If it's already a boolean, keep it as is
+    }
+    
+    // If availabilityBoolean exists, use it instead (for explicit boolean handling)
+    if (apiData.availabilityBoolean !== undefined) {
+      apiData.availability = apiData.availabilityBoolean;
+      delete apiData.availabilityBoolean; // Remove the helper field from API payload
+    }
+    
+    // Also handle other field mappings if needed (e.g., name -> title, category -> author)
+    if (apiData.name !== undefined) {
+      apiData.title = apiData.name;
+      delete apiData.name;
+    }
+    
+    if (apiData.category !== undefined) {
+      apiData.author = apiData.category;
+      delete apiData.category;
+    }
+    
+    console.log('API data being sent:', apiData);
+    
+    const response = await fetch(`${API_BASE_URL}/books/${bookId}`, {
+      method: 'PUT',
+      headers: headers,
+      body: JSON.stringify(apiData),
+    });
+
+    console.log('Update response status:', response.status);
+
+    
+
+    if (response.status === 403) {
+      const errorText = await response.text();
+      console.log('403 Error response body:', errorText);
+      throw new Error(`Access denied. Server response: ${errorText}`);
+    }
+    
+    if (response.status === 401) {
+      const errorText = await response.text();
+      console.log('401 Error response body:', errorText);
+      throw new Error(`Unauthorized. Server response: ${errorText}`);
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.log('Error response body:', errorText);
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+    }
+
+    const updatedBook = await response.json();
+    console.log('Updated book response:', updatedBook);
+    return updatedBook;
+  } catch (error) {
+    console.error('Error updating book:', error);
+    throw error;
+  }
+};
+
+export const addBook = async (newBook) => {
+  try {
+    const token = getAuthToken(); 
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers['Authorization'] = token;
+    }
+
+    // Hardcoded typeId to send
+    const hardcodedTypeId = "68456d115f797e065bfea68c";
+
+    // Prepare data for API with hardcoded typeId
+    const apiData = {
+      title: newBook.name,
+      author: newBook.category,
+      typeId: hardcodedTypeId,  // <--- hardcoded type ID here
+      language: newBook.language,
+      quantity: newBook.quantity,
+    };
+
+    console.log("Sending book to API:", apiData);
+
+    const response = await fetch(`${API_BASE_URL}/books`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(apiData),
+    });
+
+    console.log('Create response status:', response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Error response body:", errorText);
+      throw new Error(`Failed to create book: ${errorText}`);
+    }
+
+    const createdBook = await response.json();
+
+    // Optional: Transform it back to UI format
+    return {
+      id: createdBook.id,
+      name: createdBook.title,
+      category: createdBook.author,
+      language: createdBook.language,
+      quantity: createdBook.quantity,
+      availability: availabilityToString(createdBook.availability),
+    };
+  } catch (error) {
+    console.error('Error adding book:', error);
+    throw error;
+  }
+};
+
+export const deleteBook = async (id) => {
+  const token = sessionStorage.getItem("jwt"); // same as other functions
+  if (!token) {
+    throw new Error("No auth token found, cannot delete book");
+  }
+
+  const bearerToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+
+  const response = await fetch(`http://localhost:8080/api/books/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": bearerToken,
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to delete book: ${errorText}`);
+  }
+
+  return true;
+};
+
+
+
+// Export helper functions for use in components
+export { availabilityToString, availabilityToBoolean };
