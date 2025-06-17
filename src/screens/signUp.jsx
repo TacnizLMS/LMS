@@ -17,6 +17,7 @@ const SignUp = () => {
 
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState(""); // NEW for showing server errors
+  const [isLoading, setIsLoading] = useState(false);
 
   const validate = () => {
     const newErrors = {};
@@ -61,6 +62,8 @@ const SignUp = () => {
       role
     };
 
+    setIsLoading(true); // Start loading
+
     try {
       console.log(dataToSend);
       const response = await fetch("http://localhost:8080/auth/signup", {
@@ -81,6 +84,8 @@ const SignUp = () => {
     } catch (error) {
       console.error("Error:", error);
       setServerError("Something went wrong. Please try again later."); // Catch block
+    } finally {
+      setIsLoading(false); // End loading
     }
   };
 
@@ -124,6 +129,7 @@ const SignUp = () => {
               value={formData.role}
               onChange={handleChange}
               className="role-select"
+              disabled={isLoading}
             >
               <option value="User">User</option>
               <option value="Admin">Admin</option>
@@ -138,6 +144,7 @@ const SignUp = () => {
                 placeholder="First Name"
                 value={formData.firstName}
                 onChange={handleChange}
+                disabled={isLoading}
               />
               {errors.firstName && <div className="error-text">{errors.firstName}</div>}
             </div>
@@ -149,6 +156,7 @@ const SignUp = () => {
                 placeholder="Last Name"
                 value={formData.lastName}
                 onChange={handleChange}
+                disabled={isLoading}
               />
               {errors.lastName && <div className="error-text">{errors.lastName}</div>}
             </div>
@@ -162,6 +170,7 @@ const SignUp = () => {
                 placeholder="Contact No"
                 value={formData.mobile}
                 onChange={handleChange}
+                disabled={isLoading}
               />
               {errors.mobile && <div className="error-text">{errors.mobile}</div>}
             </div>
@@ -173,6 +182,7 @@ const SignUp = () => {
                 placeholder="Email"
                 value={formData.email}
                 onChange={handleChange}
+                disabled={isLoading}
               />
               {errors.email && <div className="error-text">{errors.email}</div>}
             </div>
@@ -186,6 +196,7 @@ const SignUp = () => {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
+                disabled={isLoading}
               />
               {errors.password && <div className="error-text">{errors.password}</div>}
             </div>
@@ -197,12 +208,30 @@ const SignUp = () => {
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                disabled={isLoading}
               />
               {errors.confirmPassword && <div className="error-text">{errors.confirmPassword}</div>}
             </div>
           </div>
 
-          <button type="submit" className="signup-btn">SIGN UP</button>
+          <button 
+            type="submit" 
+            className="signup-btn"
+            disabled={isLoading}
+            style={{
+              opacity: isLoading ? 0.5 : 1,
+              cursor: isLoading ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {isLoading ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <div className="spinner"></div>
+                Signing Up...
+              </div>
+            ) : (
+              'SIGN UP'
+            )}
+          </button>
         </form>
       </div>
     </div>
