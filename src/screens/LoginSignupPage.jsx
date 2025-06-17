@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 const LoginSignupPage = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const decodeJwt = () => {
     const jwt = sessionStorage.getItem("jwt");
@@ -45,6 +46,9 @@ const LoginSignupPage = () => {
 
     if (!valid) return;
 
+
+    setIsLoading(true); // Start loading
+
     try {
       const response = await fetch("http://localhost:8080/auth/signin", {
         method: "POST",
@@ -65,16 +69,16 @@ password: "123456"
 role: "User"
 */
       if (data.status) {
-sessionStorage.setItem("jwt", `Bearer ${data.jwt}`); // includes Bearer prefix
+        sessionStorage.setItem("jwt", `Bearer ${data.jwt}`); // includes Bearer prefix
 
-  const payload = JSON.parse(atob(data.jwt.split(".")[1]));
+        const payload = JSON.parse(atob(data.jwt.split(".")[1]));
 
-          sessionStorage.setItem("fullName", payload.email); // Store name
-  sessionStorage.setItem("role", payload.roles); // Store role
-  
-  sessionStorage.setItem("userId", payload.id);
+        sessionStorage.setItem("fullName", payload.email); // Store name
+        sessionStorage.setItem("role", payload.roles); // Store role
 
-  console.log("User Role:", payload.roles);
+        sessionStorage.setItem("userId", payload.id);
+
+        console.log("User Role:", payload.roles);
 
         console.log("Login message:", data.message);
         decodeJwt();
@@ -88,6 +92,8 @@ sessionStorage.setItem("jwt", `Bearer ${data.jwt}`); // includes Bearer prefix
     } catch (error) {
       console.error("Error during sign-in:", error);
       setPasswordError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -99,12 +105,12 @@ sessionStorage.setItem("jwt", `Bearer ${data.jwt}`); // includes Bearer prefix
         <p>Please enter your credentials to log in</p>
 
         <div className="input-group">
-          <input type="text" placeholder="Email" />
+          <input type="text" placeholder="Email" disabled={isLoading} />
           {emailError && <p className="error-text">{emailError}</p>}
         </div>
 
         <div className="input-group">
-          <input type="password" placeholder="Password" />
+          <input type="password" placeholder="Password" disabled={isLoading} />
           {passwordError && <p className="error-text">{passwordError}</p>}
         </div>
 
@@ -113,8 +119,23 @@ sessionStorage.setItem("jwt", `Bearer ${data.jwt}`); // includes Bearer prefix
         </Link>
 
         <center>
-          <button className="sign-in" onClick={handleSignIn}>
-            SIGN IN
+          <button 
+            className="sign-in" 
+            onClick={handleSignIn}
+            disabled={isLoading}
+            style={{
+              opacity: isLoading ? 0.5 : 1,
+              cursor: isLoading ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {isLoading ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <div className="spinner"></div>
+                Signing In...
+              </div>
+            ) : (
+              'SIGN IN'
+            )}
           </button>
         </center>
       </div>

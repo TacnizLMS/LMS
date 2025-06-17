@@ -73,6 +73,7 @@ input {
     font-family: "Montserrat";
     border-radius: 15px;
     align-items: center;
+        transition: opacity 0.2s ease-in-out;
 }
 
 .signup-section {
@@ -132,13 +133,52 @@ p{
 .input-group {
     display: flex;
     flex-direction: column;
-    margin-bottom: 0px; 
-  }
-  
-  .error-text {
+    margin-bottom: 0px;
+}
+
+.error-text {
     color: #f74d5b;;
     font-size: 0.8rem;
     margin-top: 4px;
-    text-align: left;  
-  }
-  
+    text-align: left;
+}
+
+
+.loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Alternative colored spinner (if you want to match your theme) */
+.spinner-alt {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
