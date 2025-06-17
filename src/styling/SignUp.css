@@ -130,7 +130,7 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: opacity 0.2s ease-in-out;
   }
   
   .signup-btn:hover {
@@ -164,4 +164,30 @@ body {
   text-align: left;
   font-size: 14px;
   padding-left: 5px;
+}
+
+/* Loading spinner styles */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { 
+    transform: rotate(0deg); 
+  }
+  100% { 
+    transform: rotate(360deg); 
+  }
+}
+
+/* Disabled form styling */
+input:disabled,
+select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
