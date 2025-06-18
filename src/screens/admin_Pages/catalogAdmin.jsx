@@ -29,9 +29,31 @@ const CatalogAdmin = () => {
 
   const [activeTab, setActiveTab] = useState(tabParam);
 
-  // Get user ID from localStorage
+  // Get user ID from sessionStorage
   const getUserId = () => {
     return sessionStorage.getItem("userId");
+  };
+
+  // Store catalog count in secure storage
+  const storeCatalogCount = (totalCount) => {
+    try {
+      const catalogCountData = {
+        totalCount: totalCount,
+        lastUpdated: new Date().toISOString(),
+        timestamp: Date.now()
+      };
+      
+      // Store in sessionStorage (secure for session-based storage)
+      sessionStorage.setItem("catalogCount", JSON.stringify(catalogCountData));
+      
+      // Also store in a more persistent way if needed (optional)
+      // You can use encrypted localStorage or a secure storage solution
+      localStorage.setItem("catalogCount", JSON.stringify(catalogCountData));
+      
+      console.log("Catalog count stored:", catalogCountData);
+    } catch (error) {
+      console.error("Error storing catalog count:", error);
+    }
   };
 
   // API call to return back a single book
@@ -89,15 +111,20 @@ const CatalogAdmin = () => {
       console.log('Changing status from', catalog.completeState, 'to', newCompleteState);
 
       // Update the local state
-      setCatalogs(prevCatalogs =>
-        prevCatalogs.map(catalog => {
+      setCatalogs(prevCatalogs => {
+        const updatedCatalogs = prevCatalogs.map(catalog => {
           if (catalog.id !== catalogId) return catalog;
           return {
             ...catalog,
             completeState: newCompleteState
           };
-        })
-      );
+        });
+        
+        // Update catalog count after state change
+        storeCatalogCount(updatedCatalogs.length);
+        
+        return updatedCatalogs;
+      });
 
       console.log('Status updated successfully to:', newCompleteState);
       
@@ -133,8 +160,8 @@ const CatalogAdmin = () => {
       await updateCatalog(catalogId, booksToReturn);
 
       // Update local state
-      setCatalogs(prevCatalogs =>
-        prevCatalogs.map(catalog => {
+      setCatalogs(prevCatalogs => {
+        const updatedCatalogs = prevCatalogs.map(catalog => {
           if (catalog.id !== catalogId) return catalog;
 
           const updatedBooks = catalog.catalogBooks.map(book => ({
@@ -147,8 +174,13 @@ const CatalogAdmin = () => {
             catalogBooks: updatedBooks,
             completeState: "complete" // Set to "complete" string
           };
-        })
-      );
+        });
+        
+        // Update catalog count after returning books
+        storeCatalogCount(updatedCatalogs.length);
+        
+        return updatedCatalogs;
+      });
 
       alert(`Successfully returned ${booksToReturn.length} books.`);
       
@@ -173,8 +205,8 @@ const CatalogAdmin = () => {
       await returnBackCatalog(catalogId);
 
       // Update local state
-      setCatalogs(prevCatalogs =>
-        prevCatalogs.map(catalog => {
+      setCatalogs(prevCatalogs => {
+        const updatedCatalogs = prevCatalogs.map(catalog => {
           if (catalog.id !== catalogId) return catalog;
 
           const updatedBooks = catalog.catalogBooks.map(book => ({
@@ -187,8 +219,13 @@ const CatalogAdmin = () => {
             catalogBooks: updatedBooks,
             completeState: "borrow" // Change back to borrow status
           };
-        })
-      );
+        });
+        
+        // Update catalog count after reactivating catalog
+        storeCatalogCount(updatedCatalogs.length);
+        
+        return updatedCatalogs;
+      });
 
       alert('Successfully changed all books back to "Not Returned" status.');
       
@@ -211,6 +248,10 @@ const CatalogAdmin = () => {
 
         const catalogsArray = Array.isArray(data) ? data : [data];
         setCatalogs(catalogsArray);
+        
+        // Store the total catalog count
+        storeCatalogCount(catalogsArray.length);
+        
       } catch (error) {
         console.error("Error fetching catalogs:", error);
         setError(error.message);
@@ -396,8 +437,8 @@ const CatalogAdmin = () => {
       }
 
       // Update local state for the specific book
-      setCatalogs((prevCatalogs) =>
-        prevCatalogs.map((catalog) => {
+      setCatalogs((prevCatalogs) => {
+        const updatedCatalogs = prevCatalogs.map((catalog) => {
           if (catalog.id !== catalogId) return catalog;
 
           const updatedBooks = catalog.catalogBooks.map((book) => {
@@ -424,8 +465,13 @@ const CatalogAdmin = () => {
             catalogBooks: updatedBooks,
             completeState: newCompleteState
           };
-        })
-      );
+        });
+        
+        // Update catalog count after return state change
+        storeCatalogCount(updatedCatalogs.length);
+        
+        return updatedCatalogs;
+      });
 
       // Exit edit mode after successful change
       setEditingReturn({ catalogId: null, bookId: null });
@@ -460,7 +506,13 @@ const CatalogAdmin = () => {
       
       await deleteCatalogById(catalogId);
       
-      setCatalogs(prev => prev.filter(c => c.id !== catalogId));
+      setCatalogs(prev => {
+        const updatedCatalogs = prev.filter(c => c.id !== catalogId);
+        // Update catalog count after deletion
+        storeCatalogCount(updatedCatalogs.length);
+        return updatedCatalogs;
+      });
+      
       alert('Catalog deleted successfully!');
     } catch (error) {
       console.error('Delete catalog failed:', error);
