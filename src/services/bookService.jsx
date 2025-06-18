@@ -79,10 +79,15 @@ export const fetchBooks = async () => {
     
     // Transform the data - convert boolean availability to string for UI display
     const transformedData = data.map(book => ({
-      id: book.id,
+      id: book._id?.$oid || book.id, // Handle MongoDB _id structure
       name: book.title || 'Untitled',
       category: book.author || 'Unknown Author',
-      type: book.type?.name || (typeof book.type === 'string' ? book.type : 'Unknown'),
+      type: book.type
+        ? {
+            id: book.type._id?.$oid || book.type.id || "", // Handle nested _id structure
+            name: book.type.name || "",
+          }
+        : { id: "", name: "" },
       language: book.language,
       quantity: book.quantity || 0,
       availability: availabilityToString(book.availability), // Convert boolean to string for UI
@@ -117,10 +122,15 @@ export const fetchBooksWithCredentials = async (username, password) => {
     
     const data = await response.json();
     return data.map(book => ({
-      id: book.id,
+      id: book._id?.$oid || book.id, // Handle MongoDB _id structure
       name: book.title || 'Untitled',
       category: book.author || 'Unknown Author',
-      type: book.type?.name || (typeof book.type === 'string' ? book.type : 'Unknown'),
+      type: book.type
+        ? {
+            id: book.type._id?.$oid || book.type.id || "", // Handle nested _id structure
+            name: book.type.name || "",
+          }
+        : { id: "", name: "" },
       language: book.language,
       quantity: book.quantity || 0,
       availability: availabilityToString(book.availability), // Convert boolean to string for UI
@@ -134,8 +144,6 @@ export const fetchBooksWithCredentials = async (username, password) => {
 };
 
 export const updateBook = async (bookId, updatedFields) => {
- 
-
   try {
     const token = getAuthToken();
     console.log('Updating book with ID:', bookId);
@@ -153,7 +161,11 @@ export const updateBook = async (bookId, updatedFields) => {
     // Transform the data for API - convert availability string back to boolean
     const apiData = { ...updatedFields };
     
-    
+    if (apiData.type && apiData.type.id) {
+      apiData.typeId = apiData.type.id;  // Send typeId
+      delete apiData.type;               // Remove type object
+    }
+
     // Convert availability string to boolean for API
     if (apiData.availability !== undefined) {
       if (typeof apiData.availability === 'string') {
@@ -189,8 +201,6 @@ export const updateBook = async (bookId, updatedFields) => {
     });
 
     console.log('Update response status:', response.status);
-
-    
 
     if (response.status === 403) {
       const errorText = await response.text();
@@ -230,14 +240,11 @@ export const addBook = async (newBook) => {
       headers['Authorization'] = token;
     }
 
-    // Hardcoded typeId to send
-    const hardcodedTypeId = "68456d115f797e065bfea68c";
-
     // Prepare data for API with hardcoded typeId
     const apiData = {
       title: newBook.name,
       author: newBook.category,
-      typeId: hardcodedTypeId,  // <--- hardcoded type ID here
+      typeId: newBook.type?.id,
       language: newBook.language,
       quantity: newBook.quantity,
     };
@@ -260,11 +267,17 @@ export const addBook = async (newBook) => {
 
     const createdBook = await response.json();
 
-    // Optional: Transform it back to UI format
+    // Transform it back to UI format
     return {
-      id: createdBook.id,
+      id: createdBook._id?.$oid || createdBook.id,
       name: createdBook.title,
       category: createdBook.author,
+      type: createdBook.type
+        ? {
+            id: createdBook.type._id?.$oid || createdBook.type.id || "",
+            name: createdBook.type.name || "",
+          }
+        : { id: "", name: "" },
       language: createdBook.language,
       quantity: createdBook.quantity,
       availability: availabilityToString(createdBook.availability),
@@ -298,7 +311,37 @@ export const deleteBook = async (id) => {
   return true;
 };
 
+export const fetchBookTypes = async () => {
+  try {
+    const token = getAuthToken();
 
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers['Authorization'] = token;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/types/all`, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Error response body:", errorText);
+      throw new Error(`Failed to fetch book types: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('Fetched book types:', data);
+    return data; // Returns [{ id, name }, ...]
+  } catch (error) {
+    console.error('Error fetching book types:', error);
+    throw error;
+  }
+};
 
 // Export helper functions for use in components
 export { availabilityToString, availabilityToBoolean };

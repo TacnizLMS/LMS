@@ -44,7 +44,7 @@ const BookTable = ({
                 <td>{book.id}</td>
                 <td>{book.name}</td>
                 <td>{book.category}</td>
-                <td>{book.type}</td>
+                  <td>{book.type && book.type.name ? book.type.name : 'N/A'}</td>
                 <td>{book.language}</td>
                 <td>{book.quantity}</td>
                 <td>

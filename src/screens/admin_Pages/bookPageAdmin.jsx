@@ -4,7 +4,8 @@ import {
   updateBook,
   availabilityToString,
   addBook,
-  deleteBook
+  deleteBook,
+  fetchBookTypes,
 } from "../../services/bookService";
 import BookTable from "../../components/bookTableAdmin";
 import Sidebar from "../../components/sideBar";
@@ -25,6 +26,7 @@ const BooksPageAdmin = () => {
     quantity: 1,
     availability: "Available",
   });
+  const [bookTypes, setBookTypes] = useState([]);
 
   const transformBookForUI = (book) => {
     return {
@@ -43,6 +45,16 @@ const BooksPageAdmin = () => {
 
   useEffect(() => {
     fetchBooks().then(setBooks).catch(console.error);
+    const loadBookTypes = async () => {
+      try {
+        const types = await fetchBookTypes();
+        setBookTypes(types);
+      } catch (error) {
+        console.error("Failed to load book types:", error);
+      }
+    };
+
+    loadBookTypes();
   }, []);
 
   // Function to get only the changed fields
@@ -114,17 +126,16 @@ const BooksPageAdmin = () => {
   };
 
   const handleDeleteBook = async (id) => {
-  if (!window.confirm("Are you sure you want to delete this book?")) return;
+    if (!window.confirm("Are you sure you want to delete this book?")) return;
 
-  try {
-    await deleteBook(id);
-    setBooks((prevBooks) => prevBooks.filter((book) => book.id !== id));
-  } catch (error) {
-    console.error("Failed to delete book:", error);
-    alert("Failed to delete book. Please try again.");
-  }
-};
-
+    try {
+      await deleteBook(id);
+      setBooks((prevBooks) => prevBooks.filter((book) => book.id !== id));
+    } catch (error) {
+      console.error("Failed to delete book:", error);
+      alert("Failed to delete book. Please try again.");
+    }
+  };
 
   return (
     <div className="library-page">
@@ -139,7 +150,11 @@ const BooksPageAdmin = () => {
           <div style={{ marginTop: "20px" }}></div>
         </div>
 
-        <BookTable books={books} onEditBook={handleEditBook} onDeleteBook={handleDeleteBook} />
+        <BookTable
+          books={books}
+          onEditBook={handleEditBook}
+          onDeleteBook={handleDeleteBook}
+        />
 
         {/* Add Book Modal */}
         {showAddModal && (
@@ -187,6 +202,25 @@ const BooksPageAdmin = () => {
                   }
                 />
               </label>
+              <label>
+                Type:
+                <select
+                  value={newBook.type?.id || ""}
+                  onChange={(e) => {
+                    const selected = bookTypes.find(
+                      (t) => t.id === e.target.value
+                    );
+                    setNewBook({ ...newBook, type: selected });
+                  }}
+                >
+                  <option value="">Select Type</option>
+                  {bookTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
               <div className="form-field">
                 <label>
@@ -204,19 +238,6 @@ const BooksPageAdmin = () => {
                     <option value="Tamil">Tamil</option>
                   </select>
                 </label>
-
-                {/* <label>
-                  Availability:
-                  <select
-                    value={newBook.availability}
-                    onChange={(e) =>
-                      setNewBook({ ...newBook, availability: e.target.value })
-                    }
-                  >
-                    <option>Available</option>
-                    <option>Not Available</option>
-                  </select>
-                </label> */}
               </div>
               <div
                 style={{
@@ -261,15 +282,7 @@ const BooksPageAdmin = () => {
                   }
                 />
               </label>
-              <label>
-                Type:{" "}
-                <input
-                  value={editingBook.type}
-                  onChange={(e) =>
-                    setEditingBook({ ...editingBook, type: e.target.value })
-                  }
-                />
-              </label>
+
               <label>
                 Quantity:{" "}
                 <input
@@ -282,6 +295,25 @@ const BooksPageAdmin = () => {
                     })
                   }
                 />
+              </label>
+
+              <label>
+                Type:
+                <select
+  value={editingBook.type?.id || ""}
+  onChange={(e) => {
+    const selected = bookTypes.find((t) => t.id === e.target.value);
+    setEditingBook({ ...editingBook, type: selected || { id: "", name: "" } });
+  }}
+>
+  <option value="">Select Type</option>
+  {bookTypes.map((type) => (
+    <option key={type.id} value={type.id}>
+      {type.name}
+    </option>
+  ))}
+</select>
+
               </label>
 
               <div className="form-field">

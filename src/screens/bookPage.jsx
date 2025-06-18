@@ -16,9 +16,9 @@ const BooksPage = () => {
     fetchBooks().then(setBooks).catch(console.error);
   }, []);
 
-   // Get user ID from localStorage 
-const getUserId = () => {
-    return sessionStorage.getItem("userId"); 
+  // Get user ID from localStorage
+  const getUserId = () => {
+    return sessionStorage.getItem("userId");
   };
 
   const handleAddToCart = (book) => {
@@ -60,8 +60,7 @@ const getUserId = () => {
           <button onClick={() => setShowCart(true)}>
             Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})
           </button>
-                      <div style={{ marginTop: "20px" }}></div>
-
+          <div style={{ marginTop: "20px" }}></div>
         </div>
 
         <BookTable
