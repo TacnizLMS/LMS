@@ -176,9 +176,9 @@ const CatalogAdmin = () => {
     const now = new Date();
     const expiredDate = new Date(catalog.expiredDate);
     
-    // Only consider catalogs with "borrow" or "pending" status as potentially expired
+    // Only consider catalogs with "borrow" statu as potentially expired
     // Complete catalogs are never expired
-    if (catalog.completeState === "complete") {
+    if (catalog.completeState === "complete" && catalog.completeState==="pending") {
       return false;
     }
     
