@@ -263,7 +263,8 @@ const CatalogAdmin = () => {
       console.log('Setting returnState to:', returnState);
 
       // If in completed tab and trying to change from returned to not returned, show confirmation
-      if (activeTab === "completed" && !returnState) {
+     if ((activeTab === "completed" || activeTab === "expired") && !returnState)
+ {
         const confirmMessage = 'Are you sure you want to change this book back to "Not Returned" status? This may reactivate the catalog.';
         
         if (!window.confirm(confirmMessage)) {
