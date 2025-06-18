@@ -236,3 +236,120 @@ export const deleteCatalogById = async (catalogId) => {
     throw err;
   }
 };
+
+// Function to return back a single book (change from returned to not returned)
+export const returnBackBook = async (catalogId, catalogBookId) => {
+  try {
+    const url = `${API_BASE_URL}/catalog/return-back-book/${catalogId}`;
+    console.log('Returning back book at:', url);
+    console.log('Catalog Book ID:', catalogBookId);
+
+    // Get the auth token
+    const token = getAuthToken();
+    console.log('Using token:', token ? `${token.substring(0, 20)}...` : 'No token found');
+
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = token;
+    }
+
+    const requestBody = {
+      catalogBookId: catalogBookId
+    };
+
+    console.log('Request headers:', headers);
+    console.log('Request body:', requestBody);
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(requestBody),
+    });
+
+    console.log('Response status:', response.status);
+
+    if (response.status === 403) {
+      const errorText = await response.text();
+      console.log('403 Error response body:', errorText);
+      throw new Error(`Access denied. Server response: ${errorText}`);
+    }
+
+    if (response.status === 401) {
+      const errorText = await response.text();
+      console.log('401 Error response body:', errorText);
+      throw new Error(`Unauthorized. Server response: ${errorText}`);
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.log('Error response body:', errorText);
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('Return back book response:', data);
+
+    return data;
+
+  } catch (error) {
+    console.error('Error in returnBackBook:', error);
+    throw error;
+  }
+};
+
+// Function to return back entire catalog (change all books from returned to not returned)
+export const returnBackCatalog = async (catalogId) => {
+  try {
+    const url = `${API_BASE_URL}/catalog/return-back/${catalogId}`;
+    console.log('Returning back entire catalog at:', url);
+
+    // Get the auth token
+    const token = getAuthToken();
+    console.log('Using token:', token ? `${token.substring(0, 20)}...` : 'No token found');
+
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = token;
+    }
+
+    console.log('Request headers:', headers);
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers,
+    });
+
+    console.log('Response status:', response.status);
+
+    if (response.status === 403) {
+      const errorText = await response.text();
+      console.log('403 Error response body:', errorText);
+      throw new Error(`Access denied. Server response: ${errorText}`);
+    }
+
+    if (response.status === 401) {
+      const errorText = await response.text();
+      console.log('401 Error response body:', errorText);
+      throw new Error(`Unauthorized. Server response: ${errorText}`);
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.log('Error response body:', errorText);
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('Return back catalog response:', data);
+
+    return data;
+
+  } catch (error) {
+    console.error('Error in returnBackCatalog:', error);
+    throw error;
+  }
+};

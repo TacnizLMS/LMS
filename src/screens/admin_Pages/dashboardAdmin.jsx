@@ -30,13 +30,13 @@ const DashboardAdmin = () => {
               icon={<FaBookOpen />}
               title=""
               subtitle="Total Book count"
-              to="/catalog?tab=completed"
+              to="/books-admin"
             />
             <CustomInfoCard
               icon={<FaLeaf />}
               title=""
               subtitle="Total Catalog count"
-              to="/catalog"
+              to="/catalog-admin"
             />
           </div>
           <center>
