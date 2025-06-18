@@ -56,6 +56,57 @@ const CatalogAdmin = () => {
     }
   };
 
+  // Handle status progression: pending → borrowed → complete
+  const handleStatusProgression = async (catalogId) => {
+    try {
+      console.log('handleStatusProgression called with:', catalogId);
+      
+      // Find the catalog
+      const catalog = catalogs.find(c => c.id === catalogId);
+      if (!catalog) {
+        console.error('Catalog not found:', catalogId);
+        return;
+      }
+
+      let newCompleteState;
+      
+      // Determine next state based on current state
+      switch (catalog.completeState) {
+        case "pending":
+          newCompleteState = "borrow";
+          break;
+        case "borrow":
+          newCompleteState = "complete";
+          break;
+        case "complete":
+          // Optional: Allow cycling back to pending or just return without change
+          // newCompleteState = "pending";
+          return; // Don't allow changing from complete
+        default:
+          newCompleteState = "borrow";
+      }
+
+      console.log('Changing status from', catalog.completeState, 'to', newCompleteState);
+
+      // Update the local state
+      setCatalogs(prevCatalogs =>
+        prevCatalogs.map(catalog => {
+          if (catalog.id !== catalogId) return catalog;
+          return {
+            ...catalog,
+            completeState: newCompleteState
+          };
+        })
+      );
+
+      console.log('Status updated successfully to:', newCompleteState);
+      
+    } catch (error) {
+      console.error('Failed to update status:', error);
+      alert('Failed to update status. Please try again.');
+    }
+  };
+
   // Return all books in a catalog
   const returnAllBooks = async (catalogId) => {
     try {
@@ -176,9 +227,14 @@ const CatalogAdmin = () => {
     const now = new Date();
     const expiredDate = new Date(catalog.expiredDate);
     
-    // Only consider catalogs with "borrow" statu as potentially expired
+    // Pending catalogs are never considered expired
+    if (catalog.completeState === "pending") {
+      return false;
+    }
+    
+    // Only consider catalogs with "borrow" status as potentially expired
     // Complete catalogs are never expired
-    if (catalog.completeState === "complete" && catalog.completeState==="pending") {
+    if (catalog.completeState === "complete") {
       return false;
     }
     
@@ -187,17 +243,22 @@ const CatalogAdmin = () => {
 
   // Helper function to check if catalog is active (not expired and not complete)
   const isCatalogActive = (catalog) => {
-    return (catalog.completeState === "borrow" || catalog.completeState === "pending") && !isCatalogExpired(catalog);
+    // Pending catalogs are always active
+    if (catalog.completeState === "pending") {
+      return true;
+    }
+    
+    return catalog.completeState === "borrow" && !isCatalogExpired(catalog);
   };
 
   // Filter catalogs based on active tab
   const getFilteredCatalogs = () => {
     return catalogs.filter((catalog) => {
       if (activeTab === "active") {
-        // Active catalogs: borrow/pending status and not expired
+        // Active catalogs: pending status or borrow status and not expired
         return isCatalogActive(catalog);
       } else if (activeTab === "expired") {
-        // Expired catalogs: borrow/pending status but past expiry date
+        // Expired catalogs: borrow status but past expiry date (excluding pending)
         return isCatalogExpired(catalog);
       } else {
         // Completed catalogs: complete status
@@ -211,14 +272,60 @@ const CatalogAdmin = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  // Updated status badge with click functionality
   const getStatusBadge = (catalog) => {
-    if (catalog.completeState === "complete") {
-      return <span className="status-badge completed">Returned</span>;
-    } else if (isCatalogExpired(catalog)) {
-      return <span className="status-badge overdue">Overdue</span>;
-    } else {
-      return <span className="status-badge active">Active</span>;
-    }
+    const getStatusClass = (status) => {
+      switch (status) {
+        case "complete":
+          return "completed";
+        case "pending":
+          return "pending";
+        case "borrow":
+          return isCatalogExpired(catalog) ? "overdue" : "active";
+        default:
+          return "active";
+      }
+    };
+
+    const getStatusText = (status) => {
+      switch (status) {
+        case "complete":
+          return "Returned";
+        case "pending":
+          return "Pending";
+        case "borrow":
+          return isCatalogExpired(catalog) ? "Overdue" : "Active";
+        default:
+          return "Active";
+      }
+    };
+
+    const getNextStatusText = (currentStatus) => {
+      switch (currentStatus) {
+        case "pending":
+          return "Click to mark as Borrowed";
+        case "borrow":
+          return "Click to mark as Complete";
+        case "complete":
+          return "Status Complete";
+        default:
+          return "";
+      }
+    };
+
+    return (
+      <span 
+        className={`status-badge ${getStatusClass(catalog.completeState)} ${catalog.completeState !== "complete" ? "clickable-status" : ""}`}
+        onClick={() => catalog.completeState !== "complete" && handleStatusProgression(catalog.id)}
+        title={getNextStatusText(catalog.completeState)}
+        style={{ 
+          cursor: catalog.completeState !== "complete" ? "pointer" : "default",
+          userSelect: "none"
+        }}
+      >
+        {getStatusText(catalog.completeState)}
+      </span>
+    );
   };
 
   const getTotalFine = (catalog) => {

@@ -104,32 +104,7 @@ onClick={() => onDeleteBook(book.id)}
                       <line x1="14" y1="11" x2="14" y2="17" />
                     </svg>
                   </button>
-                  <button
-                    title="Book Info"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      color: "black",
-                    }}
-                    onClick={() => alert(`Book info for ${safeRender(book.id)}`)}
-                  >
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                      <path d="M20 22V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v16" />
-                      <path d="M16 2v4" />
-                      <path d="M8 2v4" />
-                    </svg>
-                  </button>
+                  
                 </td>
               </tr>
             ))
