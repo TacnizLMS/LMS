@@ -3,9 +3,11 @@ import Sidebar from "../../components/sideBar";
 import AppBar from "../../components/appBar";
 import "../../styling/catalog.css";
 import { useLocation } from "react-router-dom";
-import { fetchAllCatalogs, updateCatalog,deleteCatalogById,returnBackBook as returnBackBookAPI,
-  returnBackCatalog as returnBackCatalogAPI } from "../../services/catalogService";
-import { FaEdit, FaTrash, FaUndo,FaRedo } from "react-icons/fa";
+import {
+  fetchAllCatalogs, updateCatalog, deleteCatalogById, returnBackBook as returnBackBookAPI,
+  returnBackCatalog as returnBackCatalogAPI
+} from "../../services/catalogService";
+import { FaEdit, FaTrash, FaUndo, FaRedo } from "react-icons/fa";
 
 const CatalogAdmin = () => {
   const [catalogs, setCatalogs] = useState([]);
@@ -42,14 +44,14 @@ const CatalogAdmin = () => {
         lastUpdated: new Date().toISOString(),
         timestamp: Date.now()
       };
-      
+
       // Store in sessionStorage (secure for session-based storage)
       sessionStorage.setItem("catalogCount", JSON.stringify(catalogCountData));
-      
+
       // Also store in a more persistent way if needed (optional)
       // You can use encrypted localStorage or a secure storage solution
       localStorage.setItem("catalogCount", JSON.stringify(catalogCountData));
-      
+
       console.log("Catalog count stored:", catalogCountData);
     } catch (error) {
       console.error("Error storing catalog count:", error);
@@ -79,49 +81,49 @@ const CatalogAdmin = () => {
   };
 
   // Handle status progression: pending → borrowed → complete
-const handleStatusProgression = async (catalogId) => {
-  try {
-    console.log('handleStatusProgression called with:', catalogId);
+  const handleStatusProgression = async (catalogId) => {
+    try {
+      console.log('handleStatusProgression called with:', catalogId);
 
-    const catalog = catalogs.find(c => c.id === catalogId);
-    if (!catalog) {
-      console.error('Catalog not found:', catalogId);
-      return;
-    }
-
-    let newCompleteState;
-
-    switch (catalog.completeState) {
-      case "pending":
-        newCompleteState = "borrow";
-        break;
-      case "borrow":
-        newCompleteState = "complete";
-        break;
-      case "complete":
-        console.log("Catalog is already complete; no update needed.");
-        return; // Don't allow changing from complete
-      default:
-        console.warn("Unexpected catalog state:", catalog.completeState);
+      const catalog = catalogs.find(c => c.id === catalogId);
+      if (!catalog) {
+        console.error('Catalog not found:', catalogId);
         return;
+      }
+
+      let newCompleteState;
+
+      switch (catalog.completeState) {
+        case "pending":
+          newCompleteState = "borrow";
+          break;
+        case "borrow":
+          newCompleteState = "complete";
+          break;
+        case "complete":
+          console.log("Catalog is already complete; no update needed.");
+          return; // Don't allow changing from complete
+        default:
+          console.warn("Unexpected catalog state:", catalog.completeState);
+          return;
+      }
+
+      // Call the API to update only the completeState
+      await updateCatalog(catalogId, newCompleteState);
+
+      // Update the local state
+      setCatalogs(prevCatalogs => prevCatalogs.map(c =>
+        c.id === catalogId ? { ...c, completeState: newCompleteState } : c
+      ));
+
+      storeCatalogCount(catalogs.length);
+      console.log('Status updated successfully to:', newCompleteState);
+
+    } catch (error) {
+      console.error('Failed to update status:', error);
+      alert('Failed to update status. Please try again.');
     }
-
-    // Call the API to update only the completeState
-    await updateCatalog(catalogId, newCompleteState);
-
-    // Update the local state
-    setCatalogs(prevCatalogs => prevCatalogs.map(c =>
-      c.id === catalogId ? { ...c, completeState: newCompleteState } : c
-    ));
-
-    storeCatalogCount(catalogs.length);
-    console.log('Status updated successfully to:', newCompleteState);
-
-  } catch (error) {
-    console.error('Failed to update status:', error);
-    alert('Failed to update status. Please try again.');
-  }
-};
+  };
 
 
   // Return all books in a catalog
@@ -165,15 +167,15 @@ const handleStatusProgression = async (catalogId) => {
             completeState: "complete" // Set to "complete" string
           };
         });
-        
+
         // Update catalog count after returning books
         storeCatalogCount(updatedCatalogs.length);
-        
+
         return updatedCatalogs;
       });
 
       alert(`Successfully returned ${booksToReturn.length} books.`);
-      
+
     } catch (error) {
       console.error('Failed to return all books:', error);
       alert('Failed to return all books. Please try again.');
@@ -184,7 +186,7 @@ const handleStatusProgression = async (catalogId) => {
   const returnBackAllBooks = async (catalogId) => {
     try {
       const confirmMessage = 'Are you sure you want to change all books in this catalog back to "Not Returned" status? This will reactivate the catalog.';
-      
+
       if (!window.confirm(confirmMessage)) {
         return;
       }
@@ -210,15 +212,15 @@ const handleStatusProgression = async (catalogId) => {
             completeState: "borrow" // Change back to borrow status
           };
         });
-        
+
         // Update catalog count after reactivating catalog
         storeCatalogCount(updatedCatalogs.length);
-        
+
         return updatedCatalogs;
       });
 
       alert('Successfully changed all books back to "Not Returned" status.');
-      
+
     } catch (error) {
       console.error('Failed to return back all books:', error);
       alert('Failed to change books back to "Not Returned". Please try again.');
@@ -233,15 +235,15 @@ const handleStatusProgression = async (catalogId) => {
         const userId = getUserId();
         console.log("Fetching catalogs for user:", userId);
 
-        const data = await fetchAllCatalogs(); 
+        const data = await fetchAllCatalogs();
         console.log("Fetched catalog data:", data);
 
         const catalogsArray = Array.isArray(data) ? data : [data];
         setCatalogs(catalogsArray);
-        
+
         // Store the total catalog count
         storeCatalogCount(catalogsArray.length);
-        
+
       } catch (error) {
         console.error("Error fetching catalogs:", error);
         setError(error.message);
@@ -257,18 +259,18 @@ const handleStatusProgression = async (catalogId) => {
   const isCatalogExpired = (catalog) => {
     const now = new Date();
     const expiredDate = new Date(catalog.expiredDate);
-    
+
     // Pending catalogs are never considered expired
     if (catalog.completeState === "pending") {
       return false;
     }
-    
+
     // Only consider catalogs with "borrow" status as potentially expired
     // Complete catalogs are never expired
     if (catalog.completeState === "complete") {
       return false;
     }
-    
+
     return expiredDate < now;
   };
 
@@ -278,7 +280,7 @@ const handleStatusProgression = async (catalogId) => {
     if (catalog.completeState === "borrow" && !isCatalogExpired(catalog)) {
       return true;
     }
-    
+
     return catalog.completeState === "borrow" && !isCatalogExpired(catalog);
   };
 
@@ -347,11 +349,11 @@ const handleStatusProgression = async (catalogId) => {
     };
 
     return (
-      <span 
+      <span
         className={`status-badge ${getStatusClass(catalog.completeState)} ${catalog.completeState !== "complete" ? "clickable-status" : ""}`}
         onClick={() => catalog.completeState !== "complete" && handleStatusProgression(catalog.id)}
         title={getNextStatusText(catalog.completeState)}
-        style={{ 
+        style={{
           cursor: catalog.completeState !== "complete" ? "pointer" : "default",
           userSelect: "none"
         }}
@@ -387,7 +389,7 @@ const handleStatusProgression = async (catalogId) => {
   const handleReturnChange = async (catalogId, bookId, newReturnState) => {
     try {
       console.log('handleReturnChange called with:', { catalogId, bookId, newReturnState });
-      
+
       // Find the catalog and the specific book
       const catalog = catalogs.find(c => c.id === catalogId);
       if (!catalog) {
@@ -406,10 +408,9 @@ const handleStatusProgression = async (catalogId) => {
       console.log('Setting returnState to:', returnState);
 
       // If in completed tab and trying to change from returned to not returned, show confirmation
-     if ((activeTab === "completed" || activeTab === "expired") && !returnState)
- {
+      if ((activeTab === "completed" || activeTab === "expired") && !returnState) {
         const confirmMessage = 'Are you sure you want to change this book back to "Not Returned" status? This may reactivate the catalog.';
-        
+
         if (!window.confirm(confirmMessage)) {
           setEditingReturn({ catalogId: null, bookId: null });
           return;
@@ -445,7 +446,7 @@ const handleStatusProgression = async (catalogId) => {
           // Check if all books are now returned to update completeState
           const allReturned = updatedBooks.every(book => book.returnState);
           console.log('All books returned?', allReturned);
-          
+
           // Determine new complete state
           let newCompleteState = catalog.completeState;
           if (allReturned) {
@@ -454,28 +455,28 @@ const handleStatusProgression = async (catalogId) => {
             // If changing from complete and not all books are returned, change to borrow
             newCompleteState = "borrow";
           }
-          
-          return { 
-            ...catalog, 
+
+          return {
+            ...catalog,
             catalogBooks: updatedBooks,
             completeState: newCompleteState
           };
         });
-        
+
         // Update catalog count after return state change
         storeCatalogCount(updatedCatalogs.length);
-        
+
         return updatedCatalogs;
       });
 
       // Exit edit mode after successful change
       setEditingReturn({ catalogId: null, bookId: null });
       console.log('Return state updated successfully');
-      
+
     } catch (error) {
       console.error('Failed to update return state:', error);
       alert('Failed to update return state. Please try again.');
-      
+
       // Reset editing state even on error to prevent getting stuck in edit mode
       setEditingReturn({ catalogId: null, bookId: null });
     }
@@ -498,16 +499,16 @@ const handleStatusProgression = async (catalogId) => {
       }
 
       console.log('Attempting to delete catalog:', catalogId);
-      
+
       await deleteCatalogById(catalogId);
-      
+
       setCatalogs(prev => {
         const updatedCatalogs = prev.filter(c => c.id !== catalogId);
         // Update catalog count after deletion
         storeCatalogCount(updatedCatalogs.length);
         return updatedCatalogs;
       });
-      
+
       alert('Catalog deleted successfully!');
     } catch (error) {
       console.error('Delete catalog failed:', error);
@@ -583,7 +584,7 @@ const handleStatusProgression = async (catalogId) => {
                   <div key={catalog.id} className="catalog-card">
                     <div className="catalog-header">
                       <div className="catalog-info">
-                        <h3>Catalog ID: {catalog.id.slice(-8)}</h3>
+                        <h3>Catalog ID: {catalog.id}</h3>
                         <p>User ID: {catalog.userId}</p>
                         <p>Total Books: {catalog.quantity}</p>
                         {getStatusBadge(catalog)}
@@ -606,17 +607,17 @@ const handleStatusProgression = async (catalogId) => {
                       </div>
                       <div className="catalog-actions">
                         {/* Return All Button - only show for active/expired catalogs with unreturned books */}
-                        {(activeTab === "active" || activeTab === "expired") && 
-                         catalog.catalogBooks.some(book => !book.returnState) && (
-                          <button
-                            className="return-all-btn"
-                            onClick={() => returnAllBooks(catalog.id)}
-                            title="Return all books in this catalog"
-                          >
-                            <FaUndo /> Return All
-                          </button>
-                        )}
-                        
+                        {(activeTab === "active" || activeTab === "expired") &&
+                          catalog.catalogBooks.some(book => !book.returnState) && (
+                            <button
+                              className="return-all-btn"
+                              onClick={() => returnAllBooks(catalog.id)}
+                              title="Return all books in this catalog"
+                            >
+                              <FaUndo /> Return All
+                            </button>
+                          )}
+
                         {/* Return Back All Button - only show for completed catalogs */}
                         {activeTab === "completed" && (
                           <button
@@ -627,7 +628,7 @@ const handleStatusProgression = async (catalogId) => {
                             <FaRedo /> Reactivate Catalog
                           </button>
                         )}
-                        
+
                         {/* Delete Catalog Button - only for completed catalogs */}
                         {activeTab === "completed" && (
                           <button
@@ -677,7 +678,7 @@ const handleStatusProgression = async (catalogId) => {
                                 <td>
                                   {activeTab === "expired" ? (
                                     editingFine.catalogId === catalog.id &&
-                                    editingFine.bookId === item.id ? (
+                                      editingFine.bookId === item.id ? (
                                       <select
                                         value={item.finePaid ? "yes" : "no"}
                                         onChange={(e) => {
@@ -687,18 +688,18 @@ const handleStatusProgression = async (catalogId) => {
                                             prevCatalogs.map((c) =>
                                               c.id === catalog.id
                                                 ? {
-                                                    ...c,
-                                                    catalogBooks:
-                                                      c.catalogBooks.map((b) =>
-                                                        b.id === item.id
-                                                          ? {
-                                                              ...b,
-                                                              finePaid:
-                                                                newFinePaid,
-                                                            }
-                                                          : b
-                                                      ),
-                                                  }
+                                                  ...c,
+                                                  catalogBooks:
+                                                    c.catalogBooks.map((b) =>
+                                                      b.id === item.id
+                                                        ? {
+                                                          ...b,
+                                                          finePaid:
+                                                            newFinePaid,
+                                                        }
+                                                        : b
+                                                    ),
+                                                }
                                                 : c
                                             )
                                           );
@@ -724,9 +725,8 @@ const handleStatusProgression = async (catalogId) => {
                                         }}
                                       >
                                         <span
-                                          className={`status-indicator ${
-                                            item.finePaid ? "paid" : "unpaid"
-                                          }`}
+                                          className={`status-indicator ${item.finePaid ? "paid" : "unpaid"
+                                            }`}
                                         >
                                           {item.finePaid ? "Paid" : "Unpaid"}
                                         </span>
@@ -743,9 +743,8 @@ const handleStatusProgression = async (catalogId) => {
                                     )
                                   ) : (
                                     <span
-                                      className={`status-indicator ${
-                                        item.finePaid ? "paid" : "unpaid"
-                                      }`}
+                                      className={`status-indicator ${item.finePaid ? "paid" : "unpaid"
+                                        }`}
                                     >
                                       {item.finePaid ? "Paid" : "Unpaid"}
                                     </span>
@@ -755,7 +754,7 @@ const handleStatusProgression = async (catalogId) => {
                                 <td>
                                   {/* Show edit functionality for all tabs now */}
                                   {editingReturn.catalogId === catalog.id &&
-                                  editingReturn.bookId === item.id ? (
+                                    editingReturn.bookId === item.id ? (
                                     <select
                                       value={item.returnState ? "returned" : "not-returned"}
                                       onChange={(e) =>
@@ -785,11 +784,10 @@ const handleStatusProgression = async (catalogId) => {
                                       }}
                                     >
                                       <span
-                                        className={`status-indicator ${
-                                          item.returnState
+                                        className={`status-indicator ${item.returnState
                                             ? "returned"
                                             : "not-returned"
-                                        }`}
+                                          }`}
                                       >
                                         {item.returnState ? "Returned" : "Not Returned"}
                                       </span>
