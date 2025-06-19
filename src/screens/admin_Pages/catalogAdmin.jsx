@@ -25,7 +25,7 @@ const CatalogAdmin = () => {
 
   // Extract tab from URL (default to 'active')
   const queryParams = new URLSearchParams(location.search);
-  const tabParam = queryParams.get("tab") || "active";
+  const tabParam = queryParams.get("tab") || "pending";
 
   const [activeTab, setActiveTab] = useState(tabParam);
 
@@ -275,7 +275,7 @@ const handleStatusProgression = async (catalogId) => {
   // Helper function to check if catalog is active (not expired and not complete)
   const isCatalogActive = (catalog) => {
     // Pending catalogs are always active
-    if (catalog.completeState === "pending") {
+    if (catalog.completeState === "borrow" && !isCatalogExpired(catalog)) {
       return true;
     }
     
@@ -285,7 +285,9 @@ const handleStatusProgression = async (catalogId) => {
   // Filter catalogs based on active tab
   const getFilteredCatalogs = () => {
     return catalogs.filter((catalog) => {
-      if (activeTab === "active") {
+    if (activeTab === 'pending') {
+        return catalog.completeState === "pending";
+      } else if (activeTab === "active") {
         // Active catalogs: pending status or borrow status and not expired
         return isCatalogActive(catalog);
       } else if (activeTab === "expired") {
@@ -365,11 +367,14 @@ const handleStatusProgression = async (catalogId) => {
 
   // Get counts for each tab
   const getCatalogCounts = () => {
+        const pending = catalogs.filter(c => c.completeState === "pending").length;
+
     const activeCatalogs = catalogs.filter(catalog => isCatalogActive(catalog));
     const expiredCatalogs = catalogs.filter(catalog => isCatalogExpired(catalog));
     const completedCatalogs = catalogs.filter(catalog => catalog.completeState === "complete");
 
     return {
+      pending: pending,
       active: activeCatalogs.length,
       expired: expiredCatalogs.length,
       completed: completedCatalogs.length,
@@ -523,9 +528,17 @@ const handleStatusProgression = async (catalogId) => {
         <AppBar />
         <div className="tabs-container">
           <div className="tab-buttons">
+           <button
+              className={activeTab === 'pending' ? 'active' : ''}
+              onClick={() => setActiveTab('pending')}
+            >
+              Pending Catalogs
+              {catalogCounts.pending > 0 && <span className="tab-count">{catalogCounts.pending}</span>}
+            </button>
+
             <button
-              className={activeTab === "active" ? "active" : ""}
-              onClick={() => setActiveTab("active")}
+              className={activeTab === 'active' ? 'active' : ''}
+              onClick={() => setActiveTab('active')}
             >
               Active Catalogs
               {catalogCounts.active > 0 && (
@@ -546,13 +559,11 @@ const handleStatusProgression = async (catalogId) => {
               )}
             </button>
             <button
-              className={activeTab === "completed" ? "active" : ""}
-              onClick={() => setActiveTab("completed")}
+              className={activeTab === 'completed' ? 'active' : ''}
+              onClick={() => setActiveTab('completed')}
             >
               Completed Catalogs
-              {catalogCounts.completed > 0 && (
-                <span className="tab-count">{catalogCounts.completed}</span>
-              )}
+              {catalogCounts.completed > 0 && <span className="tab-count">{catalogCounts.completed}</span>}
             </button>
           </div>
 
