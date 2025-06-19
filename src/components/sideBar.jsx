@@ -34,7 +34,7 @@ const Sidebar = () => {
     { name: "Admin Dashboard", icon: <FaHome />, path: "/admin-dashboard" },
     { name: "Catalog Admin", icon: <FaLeaf />, path: "/catalog-admin" },
     { name: "Books Admin", icon: <FaBook />, path: "/books-admin" },
-        { name: "Users", icon: <FaUsers />, path: "/users" },
+        { name: "Users", icon: <FaUsers />, path: "/userPageAdmin" },
 
 
   ];

@@ -79,60 +79,50 @@ const CatalogAdmin = () => {
   };
 
   // Handle status progression: pending → borrowed → complete
-  const handleStatusProgression = async (catalogId) => {
-    try {
-      console.log('handleStatusProgression called with:', catalogId);
-      
-      // Find the catalog
-      const catalog = catalogs.find(c => c.id === catalogId);
-      if (!catalog) {
-        console.error('Catalog not found:', catalogId);
-        return;
-      }
+const handleStatusProgression = async (catalogId) => {
+  try {
+    console.log('handleStatusProgression called with:', catalogId);
 
-      let newCompleteState;
-      
-      // Determine next state based on current state
-      switch (catalog.completeState) {
-        case "pending":
-          newCompleteState = "borrow";
-          break;
-        case "borrow":
-          newCompleteState = "complete";
-          break;
-        case "complete":
-          // Optional: Allow cycling back to pending or just return without change
-          // newCompleteState = "pending";
-          return; // Don't allow changing from complete
-        default:
-          newCompleteState = "borrow";
-      }
-
-      console.log('Changing status from', catalog.completeState, 'to', newCompleteState);
-
-      // Update the local state
-      setCatalogs(prevCatalogs => {
-        const updatedCatalogs = prevCatalogs.map(catalog => {
-          if (catalog.id !== catalogId) return catalog;
-          return {
-            ...catalog,
-            completeState: newCompleteState
-          };
-        });
-        
-        // Update catalog count after state change
-        storeCatalogCount(updatedCatalogs.length);
-        
-        return updatedCatalogs;
-      });
-
-      console.log('Status updated successfully to:', newCompleteState);
-      
-    } catch (error) {
-      console.error('Failed to update status:', error);
-      alert('Failed to update status. Please try again.');
+    const catalog = catalogs.find(c => c.id === catalogId);
+    if (!catalog) {
+      console.error('Catalog not found:', catalogId);
+      return;
     }
-  };
+
+    let newCompleteState;
+
+    switch (catalog.completeState) {
+      case "pending":
+        newCompleteState = "borrow";
+        break;
+      case "borrow":
+        newCompleteState = "complete";
+        break;
+      case "complete":
+        console.log("Catalog is already complete; no update needed.");
+        return; // Don't allow changing from complete
+      default:
+        console.warn("Unexpected catalog state:", catalog.completeState);
+        return;
+    }
+
+    // Call the API to update only the completeState
+    await updateCatalog(catalogId, newCompleteState);
+
+    // Update the local state
+    setCatalogs(prevCatalogs => prevCatalogs.map(c =>
+      c.id === catalogId ? { ...c, completeState: newCompleteState } : c
+    ));
+
+    storeCatalogCount(catalogs.length);
+    console.log('Status updated successfully to:', newCompleteState);
+
+  } catch (error) {
+    console.error('Failed to update status:', error);
+    alert('Failed to update status. Please try again.');
+  }
+};
+
 
   // Return all books in a catalog
   const returnAllBooks = async (catalogId) => {
