@@ -85,7 +85,7 @@ role: "User"
         if (data.message === "Login success" && data.jwt !== null && payload.roles.includes("Admin")) {
           navigate("/admin-dashboard");
         } else if (data.message === "Login success" && data.jwt !== null && payload.roles.includes("User")) {
-          navigate("/user-dashboard");
+          navigate("/dashboard");
         }
       } else {
         alert("Login failed please try again.");
