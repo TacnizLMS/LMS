@@ -3,8 +3,9 @@ import Sidebar from "../../components/sideBar";
 import AppBar from "../../components/appBar";
 import "../../styling/catalog.css";
 import { useLocation } from "react-router-dom";
-import { fetchAllCatalogs, updateCatalog,deleteCatalogById } from "../../services/catalogService";
-import { FaEdit, FaTrash, FaUndo } from "react-icons/fa";
+import { fetchAllCatalogs, updateCatalog,deleteCatalogById,returnBackBook as returnBackBookAPI,
+  returnBackCatalog as returnBackCatalogAPI } from "../../services/catalogService";
+import { FaEdit, FaTrash, FaUndo,FaRedo } from "react-icons/fa";
 
 const CatalogAdmin = () => {
   const [catalogs, setCatalogs] = useState([]);
@@ -28,11 +29,110 @@ const CatalogAdmin = () => {
 
   const [activeTab, setActiveTab] = useState(tabParam);
 
-  // Get user ID from localStorage
+  // Get user ID from sessionStorage
   const getUserId = () => {
     return sessionStorage.getItem("userId");
   };
 
+  // Store catalog count in secure storage
+  const storeCatalogCount = (totalCount) => {
+    try {
+      const catalogCountData = {
+        totalCount: totalCount,
+        lastUpdated: new Date().toISOString(),
+        timestamp: Date.now()
+      };
+      
+      // Store in sessionStorage (secure for session-based storage)
+      sessionStorage.setItem("catalogCount", JSON.stringify(catalogCountData));
+      
+      // Also store in a more persistent way if needed (optional)
+      // You can use encrypted localStorage or a secure storage solution
+      localStorage.setItem("catalogCount", JSON.stringify(catalogCountData));
+      
+      console.log("Catalog count stored:", catalogCountData);
+    } catch (error) {
+      console.error("Error storing catalog count:", error);
+    }
+  };
+
+  // API call to return back a single book
+  const returnBackBook = async (catalogId, catalogBookId) => {
+    try {
+      console.log('Calling returnBackBook API with:', { catalogId, catalogBookId });
+      return await returnBackBookAPI(catalogId, catalogBookId);
+    } catch (error) {
+      console.error('Error returning back book:', error);
+      throw error;
+    }
+  };
+
+  // API call to return back entire catalog
+  const returnBackCatalog = async (catalogId) => {
+    try {
+      console.log('Calling returnBackCatalog API with:', catalogId);
+      return await returnBackCatalogAPI(catalogId);
+    } catch (error) {
+      console.error('Error returning back catalog:', error);
+      throw error;
+    }
+  };
+
+  // Handle status progression: pending → borrowed → complete
+  const handleStatusProgression = async (catalogId) => {
+    try {
+      console.log('handleStatusProgression called with:', catalogId);
+      
+      // Find the catalog
+      const catalog = catalogs.find(c => c.id === catalogId);
+      if (!catalog) {
+        console.error('Catalog not found:', catalogId);
+        return;
+      }
+
+      let newCompleteState;
+      
+      // Determine next state based on current state
+      switch (catalog.completeState) {
+        case "pending":
+          newCompleteState = "borrow";
+          break;
+        case "borrow":
+          newCompleteState = "complete";
+          break;
+        case "complete":
+          // Optional: Allow cycling back to pending or just return without change
+          // newCompleteState = "pending";
+          return; // Don't allow changing from complete
+        default:
+          newCompleteState = "borrow";
+      }
+
+      console.log('Changing status from', catalog.completeState, 'to', newCompleteState);
+
+      // Update the local state
+      setCatalogs(prevCatalogs => {
+        const updatedCatalogs = prevCatalogs.map(catalog => {
+          if (catalog.id !== catalogId) return catalog;
+          return {
+            ...catalog,
+            completeState: newCompleteState
+          };
+        });
+        
+        // Update catalog count after state change
+        storeCatalogCount(updatedCatalogs.length);
+        
+        return updatedCatalogs;
+      });
+
+      console.log('Status updated successfully to:', newCompleteState);
+      
+    } catch (error) {
+      console.error('Failed to update status:', error);
+      alert('Failed to update status. Please try again.');
+    }
+  };
 
   // Return all books in a catalog
   const returnAllBooks = async (catalogId) => {
@@ -60,8 +160,8 @@ const CatalogAdmin = () => {
       await updateCatalog(catalogId, booksToReturn);
 
       // Update local state
-      setCatalogs(prevCatalogs =>
-        prevCatalogs.map(catalog => {
+      setCatalogs(prevCatalogs => {
+        const updatedCatalogs = prevCatalogs.map(catalog => {
           if (catalog.id !== catalogId) return catalog;
 
           const updatedBooks = catalog.catalogBooks.map(book => ({
@@ -72,16 +172,66 @@ const CatalogAdmin = () => {
           return {
             ...catalog,
             catalogBooks: updatedBooks,
-            completeState: true
+            completeState: "complete" // Set to "complete" string
           };
-        })
-      );
+        });
+        
+        // Update catalog count after returning books
+        storeCatalogCount(updatedCatalogs.length);
+        
+        return updatedCatalogs;
+      });
 
       alert(`Successfully returned ${booksToReturn.length} books.`);
       
     } catch (error) {
       console.error('Failed to return all books:', error);
       alert('Failed to return all books. Please try again.');
+    }
+  };
+
+  // Return back all books in a completed catalog
+  const returnBackAllBooks = async (catalogId) => {
+    try {
+      const confirmMessage = 'Are you sure you want to change all books in this catalog back to "Not Returned" status? This will reactivate the catalog.';
+      
+      if (!window.confirm(confirmMessage)) {
+        return;
+      }
+
+      console.log('Returning back all books in catalog:', catalogId);
+
+      // Call the API to return back entire catalog
+      await returnBackCatalog(catalogId);
+
+      // Update local state
+      setCatalogs(prevCatalogs => {
+        const updatedCatalogs = prevCatalogs.map(catalog => {
+          if (catalog.id !== catalogId) return catalog;
+
+          const updatedBooks = catalog.catalogBooks.map(book => ({
+            ...book,
+            returnState: false
+          }));
+
+          return {
+            ...catalog,
+            catalogBooks: updatedBooks,
+            completeState: "borrow" // Change back to borrow status
+          };
+        });
+        
+        // Update catalog count after reactivating catalog
+        storeCatalogCount(updatedCatalogs.length);
+        
+        return updatedCatalogs;
+      });
+
+      alert('Successfully changed all books back to "Not Returned" status.');
+      
+    } catch (error) {
+      console.error('Failed to return back all books:', error);
+      alert('Failed to change books back to "Not Returned". Please try again.');
     }
   };
 
@@ -98,6 +248,10 @@ const CatalogAdmin = () => {
 
         const catalogsArray = Array.isArray(data) ? data : [data];
         setCatalogs(catalogsArray);
+        
+        // Store the total catalog count
+        storeCatalogCount(catalogsArray.length);
+        
       } catch (error) {
         console.error("Error fetching catalogs:", error);
         setError(error.message);
@@ -113,18 +267,43 @@ const CatalogAdmin = () => {
   const isCatalogExpired = (catalog) => {
     const now = new Date();
     const expiredDate = new Date(catalog.expiredDate);
-    return expiredDate < now && !catalog.completeState;
+    
+    // Pending catalogs are never considered expired
+    if (catalog.completeState === "pending") {
+      return false;
+    }
+    
+    // Only consider catalogs with "borrow" status as potentially expired
+    // Complete catalogs are never expired
+    if (catalog.completeState === "complete") {
+      return false;
+    }
+    
+    return expiredDate < now;
+  };
+
+  // Helper function to check if catalog is active (not expired and not complete)
+  const isCatalogActive = (catalog) => {
+    // Pending catalogs are always active
+    if (catalog.completeState === "pending") {
+      return true;
+    }
+    
+    return catalog.completeState === "borrow" && !isCatalogExpired(catalog);
   };
 
   // Filter catalogs based on active tab
   const getFilteredCatalogs = () => {
     return catalogs.filter((catalog) => {
       if (activeTab === "active") {
-        return !catalog.completeState && !isCatalogExpired(catalog); // Active/borrowed catalogs (not expired)
+        // Active catalogs: pending status or borrow status and not expired
+        return isCatalogActive(catalog);
       } else if (activeTab === "expired") {
-        return isCatalogExpired(catalog); // Expired catalogs
+        // Expired catalogs: borrow status but past expiry date (excluding pending)
+        return isCatalogExpired(catalog);
       } else {
-        return catalog.completeState; // Completed/returned catalogs
+        // Completed catalogs: complete status
+        return catalog.completeState === "complete";
       }
     });
   };
@@ -134,14 +313,60 @@ const CatalogAdmin = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  // Updated status badge with click functionality
   const getStatusBadge = (catalog) => {
-    if (catalog.completeState) {
-      return <span className="status-badge completed">Returned</span>;
-    } else if (isCatalogExpired(catalog)) {
-      return <span className="status-badge overdue">Overdue</span>;
-    } else {
-      return <span className="status-badge active">Active</span>;
-    }
+    const getStatusClass = (status) => {
+      switch (status) {
+        case "complete":
+          return "completed";
+        case "pending":
+          return "pending";
+        case "borrow":
+          return isCatalogExpired(catalog) ? "overdue" : "active";
+        default:
+          return "active";
+      }
+    };
+
+    const getStatusText = (status) => {
+      switch (status) {
+        case "complete":
+          return "Returned";
+        case "pending":
+          return "Pending";
+        case "borrow":
+          return isCatalogExpired(catalog) ? "Overdue" : "Active";
+        default:
+          return "Active";
+      }
+    };
+
+    const getNextStatusText = (currentStatus) => {
+      switch (currentStatus) {
+        case "pending":
+          return "Click to mark as Borrowed";
+        case "borrow":
+          return "Click to mark as Complete";
+        case "complete":
+          return "Status Complete";
+        default:
+          return "";
+      }
+    };
+
+    return (
+      <span 
+        className={`status-badge ${getStatusClass(catalog.completeState)} ${catalog.completeState !== "complete" ? "clickable-status" : ""}`}
+        onClick={() => catalog.completeState !== "complete" && handleStatusProgression(catalog.id)}
+        title={getNextStatusText(catalog.completeState)}
+        style={{ 
+          cursor: catalog.completeState !== "complete" ? "pointer" : "default",
+          userSelect: "none"
+        }}
+      >
+        {getStatusText(catalog.completeState)}
+      </span>
+    );
   };
 
   const getTotalFine = (catalog) => {
@@ -150,15 +375,9 @@ const CatalogAdmin = () => {
 
   // Get counts for each tab
   const getCatalogCounts = () => {
-    const activeCatalogs = catalogs.filter(
-      (catalog) => !catalog.completeState && !isCatalogExpired(catalog)
-    );
-    const expiredCatalogs = catalogs.filter((catalog) =>
-      isCatalogExpired(catalog)
-    );
-    const completedCatalogs = catalogs.filter(
-      (catalog) => catalog.completeState
-    );
+    const activeCatalogs = catalogs.filter(catalog => isCatalogActive(catalog));
+    const expiredCatalogs = catalogs.filter(catalog => isCatalogExpired(catalog));
+    const completedCatalogs = catalogs.filter(catalog => catalog.completeState === "complete");
 
     return {
       active: activeCatalogs.length,
@@ -191,21 +410,35 @@ const CatalogAdmin = () => {
       const returnState = newReturnState === "returned";
       console.log('Setting returnState to:', returnState);
 
-      // Prepare the book data for API call
-      const books = [{
-        bookId: catalogBook.book.id,
-        quantity: 1,
-        returnState: returnState // Make sure to include the return state in the API call
-      }];
+      // If in completed tab and trying to change from returned to not returned, show confirmation
+     if ((activeTab === "completed" || activeTab === "expired") && !returnState)
+ {
+        const confirmMessage = 'Are you sure you want to change this book back to "Not Returned" status? This may reactivate the catalog.';
+        
+        if (!window.confirm(confirmMessage)) {
+          setEditingReturn({ catalogId: null, bookId: null });
+          return;
+        }
 
-      console.log('Updating book with data:', books);
+        // Call the return back book API
+        await returnBackBook(catalogId, catalogBook.id); // catalogBook.id is the catalogBookId
+      } else {
+        // Prepare the book data for API call
+        const books = [{
+          bookId: catalogBook.book.id,
+          quantity: 1,
+          returnState: returnState
+        }];
 
-      // Call the API to update the book
-      await updateCatalog(catalogId, books);
+        console.log('Updating book with data:', books);
+
+        // Call the API to update the book
+        await updateCatalog(catalogId, books);
+      }
 
       // Update local state for the specific book
-      setCatalogs((prevCatalogs) =>
-        prevCatalogs.map((catalog) => {
+      setCatalogs((prevCatalogs) => {
+        const updatedCatalogs = prevCatalogs.map((catalog) => {
           if (catalog.id !== catalogId) return catalog;
 
           const updatedBooks = catalog.catalogBooks.map((book) => {
@@ -218,13 +451,27 @@ const CatalogAdmin = () => {
           const allReturned = updatedBooks.every(book => book.returnState);
           console.log('All books returned?', allReturned);
           
+          // Determine new complete state
+          let newCompleteState = catalog.completeState;
+          if (allReturned) {
+            newCompleteState = "complete";
+          } else if (catalog.completeState === "complete") {
+            // If changing from complete and not all books are returned, change to borrow
+            newCompleteState = "borrow";
+          }
+          
           return { 
             ...catalog, 
             catalogBooks: updatedBooks,
-            completeState: allReturned
+            completeState: newCompleteState
           };
-        })
-      );
+        });
+        
+        // Update catalog count after return state change
+        storeCatalogCount(updatedCatalogs.length);
+        
+        return updatedCatalogs;
+      });
 
       // Exit edit mode after successful change
       setEditingReturn({ catalogId: null, bookId: null });
@@ -239,39 +486,45 @@ const CatalogAdmin = () => {
     }
   };
 
-const handleDeleteCatalog = async (catalogId) => {
-  try {
-    setDeletingItems(prev => new Set(prev).add(`catalog-${catalogId}`));
+  const handleDeleteCatalog = async (catalogId) => {
+    try {
+      setDeletingItems(prev => new Set(prev).add(`catalog-${catalogId}`));
 
-    const catalog = catalogs.find(c => c.id === catalogId);
-    if (!catalog) {
-      throw new Error('Catalog not found');
+      const catalog = catalogs.find(c => c.id === catalogId);
+      if (!catalog) {
+        throw new Error('Catalog not found');
+      }
+
+      // Check for unreturned books
+      const unreturnedBooks = catalog.catalogBooks.filter(book => !book.returnState);
+      if (unreturnedBooks.length > 0) {
+        alert(`Cannot delete catalog with unreturned books`);
+        return;
+      }
+
+      console.log('Attempting to delete catalog:', catalogId);
+      
+      await deleteCatalogById(catalogId);
+      
+      setCatalogs(prev => {
+        const updatedCatalogs = prev.filter(c => c.id !== catalogId);
+        // Update catalog count after deletion
+        storeCatalogCount(updatedCatalogs.length);
+        return updatedCatalogs;
+      });
+      
+      alert('Catalog deleted successfully!');
+    } catch (error) {
+      console.error('Delete catalog failed:', error);
+      alert(`Delete failed: ${error.message}`);
+    } finally {
+      setDeletingItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(`catalog-${catalogId}`);
+        return newSet;
+      });
     }
-
-    // Check for unreturned books
-    const unreturnedBooks = catalog.catalogBooks.filter(book => !book.returnState);
-    if (unreturnedBooks.length > 0) {
-      alert(`Cannot delete catalog with unreturned books`);
-      return;
-    }
-
-    console.log('Attempting to delete catalog:', catalogId);
-    
-    await deleteCatalogById(catalogId);
-    
-    setCatalogs(prev => prev.filter(c => c.id !== catalogId));
-    alert('Catalog deleted successfully!');
-  } catch (error) {
-    console.error('Delete catalog failed:', error);
-    alert(`Delete failed: ${error.message}`);
-  } finally {
-    setDeletingItems(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(`catalog-${catalogId}`);
-      return newSet;
-    });
-  }
-};
+  };
 
   return (
     <div className="library-page">
@@ -363,24 +616,33 @@ const handleDeleteCatalog = async (catalogId) => {
                           </button>
                         )}
                         
-                        {/* Delete Catalog Button */}
-                    {activeTab === "completed" && (
-  <button
-    className="delete-catalog-btn"
-    onClick={() => {
-      if (window.confirm('Are you sure you want to delete this entire catalog? This action cannot be undone.')) {
-        handleDeleteCatalog(catalog.id);
-      }
-    }}
-    disabled={deletingItems.has(`catalog-${catalog.id}`)}
-    title="Delete entire catalog"
-  >
-    <FaTrash />
-    {deletingItems.has(`catalog-${catalog.id}`) ? 'Deleting...' : 'Delete Catalog'}
-  </button>
-)}
-
-
+                        {/* Return Back All Button - only show for completed catalogs */}
+                        {activeTab === "completed" && (
+                          <button
+                            className="return-back-all-btn"
+                            onClick={() => returnBackAllBooks(catalog.id)}
+                            title="Change all books back to Not Returned status"
+                          >
+                            <FaRedo /> Reactivate Catalog
+                          </button>
+                        )}
+                        
+                        {/* Delete Catalog Button - only for completed catalogs */}
+                        {activeTab === "completed" && (
+                          <button
+                            className="delete-catalog-btn"
+                            onClick={() => {
+                              if (window.confirm('Are you sure you want to delete this entire catalog? This action cannot be undone.')) {
+                                handleDeleteCatalog(catalog.id);
+                              }
+                            }}
+                            disabled={deletingItems.has(`catalog-${catalog.id}`)}
+                            title="Delete entire catalog"
+                          >
+                            <FaTrash />
+                            {deletingItems.has(`catalog-${catalog.id}`) ? 'Deleting...' : 'Delete Catalog'}
+                          </button>
+                        )}
                       </div>
                     </div>
 
@@ -490,68 +752,58 @@ const handleDeleteCatalog = async (catalogId) => {
                                 </td>
 
                                 <td>
-                                  {activeTab === "expired" || activeTab === "active" ? (
-                                    editingReturn.catalogId === catalog.id &&
-                                    editingReturn.bookId === item.id ? (
-                                      <select
-                                        value={item.returnState ? "returned" : "not-returned"}
-                                        onChange={(e) =>
-                                          handleReturnChange(
-                                            catalog.id,
-                                            item.id,
-                                            e.target.value
-                                          )
-                                        }
-                                        onBlur={() =>
+                                  {/* Show edit functionality for all tabs now */}
+                                  {editingReturn.catalogId === catalog.id &&
+                                  editingReturn.bookId === item.id ? (
+                                    <select
+                                      value={item.returnState ? "returned" : "not-returned"}
+                                      onChange={(e) =>
+                                        handleReturnChange(
+                                          catalog.id,
+                                          item.id,
+                                          e.target.value
+                                        )
+                                      }
+                                      onBlur={() =>
+                                        setEditingReturn({
+                                          catalogId: null,
+                                          bookId: null,
+                                        })
+                                      }
+                                      autoFocus
+                                    >
+                                      <option value="returned">Returned</option>
+                                      <option value="not-returned">Not Returned</option>
+                                    </select>
+                                  ) : (
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "15px",
+                                      }}
+                                    >
+                                      <span
+                                        className={`status-indicator ${
+                                          item.returnState
+                                            ? "returned"
+                                            : "not-returned"
+                                        }`}
+                                      >
+                                        {item.returnState ? "Returned" : "Not Returned"}
+                                      </span>
+
+                                      {/* Show edit icon for all tabs */}
+                                      <FaEdit
+                                        className="edit-icon"
+                                        onClick={() =>
                                           setEditingReturn({
-                                            catalogId: null,
-                                            bookId: null,
+                                            catalogId: catalog.id,
+                                            bookId: item.id,
                                           })
                                         }
-                                        autoFocus
-                                      >
-                                        <option value="returned">Returned</option>
-                                        <option value="not-returned">Not Returned</option>
-                                      </select>
-                                    ) : (
-                                      <div
-                                        style={{
-                                          display: "flex",
-                                          alignItems: "center",
-                                          gap: "15px",
-                                        }}
-                                      >
-                                        <span
-                                          className={`status-indicator ${
-                                            item.returnState
-                                              ? "returned"
-                                              : "not-returned"
-                                          }`}
-                                        >
-                                          {item.returnState ? "Returned" : "Not Returned"}
-                                        </span>
-
-                                        <FaEdit
-                                          className="edit-icon"
-                                          onClick={() =>
-                                            setEditingReturn({
-                                              catalogId: catalog.id,
-                                              bookId: item.id,
-                                            })
-                                          }
-                                        />
-                                      </div>
-                                    )
-                                  ) : (
-                                    <span
-                                      className={`status-indicator ${
-                                        item.returnState
-                                          ? "returned"
-                                          : "not-returned"
-                                      }`}
-                                    >
-                                      {item.returnState ? "Returned" : "Not Returned"}
-                                    </span>
+                                      />
+                                    </div>
                                   )}
                                 </td>
                               </tr>

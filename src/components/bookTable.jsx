@@ -21,6 +21,9 @@ const BookTable = ({
     }
   };
 
+  // Check if any item is in cart to show the Set Quantity column
+  const showQuantityColumn = cart.length > 0;
+
   return (
     <div className="table-wrapper">
       <table className="books-table">
@@ -34,7 +37,7 @@ const BookTable = ({
             <th>Quantity</th>
             <th>Availability</th>
             <th>Add to Cart</th>
-            <th>Set Quantity</th> 
+            {showQuantityColumn && <th>Set Quantity</th>}
           </tr>
         </thead>
         <tbody>
@@ -44,7 +47,7 @@ const BookTable = ({
                 <td>{book.id}</td>
                 <td>{book.name}</td>
                 <td>{book.category}</td>
-                <td>{book.type}</td>
+                  <td>{book.type && book.type.name ? book.type.name : 'N/A'}</td>
                 <td>{book.language}</td>
                 <td>{book.quantity}</td>
                 <td>
@@ -69,20 +72,22 @@ const BookTable = ({
                     />
                   )}
                 </td>
-                <td>
-                  {isInCart(book.id) && (
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <button onClick={() => handleDecreaseQuantity(book.id)}>-</button>
-                      <span>{getQuantity(book.id)}</span>
-                      <button onClick={() => handleIncreaseQuantity(book.id)}>+</button>
-                    </div>
-                  )}
-                </td>
+                {showQuantityColumn && (
+                  <td>
+                    {isInCart(book.id) && (
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <button onClick={() => handleDecreaseQuantity(book.id)}>-</button>
+                        <span>{getQuantity(book.id)}</span>
+                        <button onClick={() => handleIncreaseQuantity(book.id)}>+</button>
+                      </div>
+                    )}
+                  </td>
+                )}
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="9" style={{ textAlign: "center" }}>
+              <td colSpan={showQuantityColumn ? "9" : "8"} style={{ textAlign: "center" }}>
                 No records found
               </td>
             </tr>
@@ -92,7 +97,5 @@ const BookTable = ({
     </div>
   );
 };
-
-
 
 export default BookTable;

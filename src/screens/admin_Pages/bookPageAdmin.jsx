@@ -4,12 +4,36 @@ import {
   updateBook,
   availabilityToString,
   addBook,
-  deleteBook
+  deleteBook,
+  fetchBookTypes,
 } from "../../services/bookService";
 import BookTable from "../../components/bookTableAdmin";
 import Sidebar from "../../components/sideBar";
 import AppBar from "../../components/appBar";
 import "../../styling/book.css";
+
+// Store book count in secure storage
+const storeBookCount = (totalCount, totalBooks) => {
+  try {
+    const bookCountData = {
+      totalCount: totalCount,
+      totalBooks: totalBooks,
+      lastUpdated: new Date().toISOString(),
+      timestamp: Date.now()
+    };
+    
+    // Store in sessionStorage (secure for session-based storage)
+    sessionStorage.setItem("bookCount", JSON.stringify(bookCountData));
+    
+    // Also store in a more persistent way if needed (optional)
+    // You can use encrypted localStorage or a secure storage solution
+    localStorage.setItem("bookCount", JSON.stringify(bookCountData));
+    
+    console.log("Book count stored:", bookCountData);
+  } catch (error) {
+    console.error("Error storing book count:", error);
+  }
+};
 
 const BooksPageAdmin = () => {
   const [books, setBooks] = useState([]);
@@ -25,6 +49,7 @@ const BooksPageAdmin = () => {
     quantity: 1,
     availability: "Available",
   });
+  const [bookTypes, setBookTypes] = useState([]);
 
   const transformBookForUI = (book) => {
     return {
@@ -41,8 +66,38 @@ const BooksPageAdmin = () => {
     };
   };
 
+  // Function to calculate and store total book count
+  const calculateAndStoreTotalCount = (booksList) => {
+    const totalCount = booksList.reduce((sum, book) => {
+      const quantity = parseInt(book.quantity) || 0;
+      return sum + quantity;
+    }, 0);
+    
+    // Store book count using the secure storage function
+    storeBookCount(totalCount, booksList.length);
+    
+    return totalCount;
+  };
+
   useEffect(() => {
-    fetchBooks().then(setBooks).catch(console.error);
+    // Fetch fresh data
+    fetchBooks()
+      .then((fetchedBooks) => {
+        setBooks(fetchedBooks);
+        calculateAndStoreTotalCount(fetchedBooks);
+      })
+      .catch(console.error);
+    
+    const loadBookTypes = async () => {
+      try {
+        const types = await fetchBookTypes();
+        setBookTypes(types);
+      } catch (error) {
+        console.error("Failed to load book types:", error);
+      }
+    };
+
+    loadBookTypes();
   }, []);
 
   // Function to get only the changed fields
@@ -79,11 +134,14 @@ const BooksPageAdmin = () => {
 
       const transformedBook = transformBookForUI(updatedBook);
 
-      setBooks((prevBooks) =>
-        prevBooks.map((book) =>
-          book.id === editingBook.id ? transformedBook : book
-        )
+      const updatedBooks = books.map((book) =>
+        book.id === editingBook.id ? transformedBook : book
       );
+      
+      setBooks(updatedBooks);
+      
+      // Recalculate and store total count
+      calculateAndStoreTotalCount(updatedBooks);
 
       setShowEditModal(false);
       setEditingBook(null);
@@ -98,12 +156,16 @@ const BooksPageAdmin = () => {
     try {
       const createdBook = await addBook(newBook);
 
-      setBooks((prev) => [...prev, createdBook]);
+      const updatedBooks = [...books, createdBook];
+      setBooks(updatedBooks);
+      
+      // Recalculate and store total count
+      calculateAndStoreTotalCount(updatedBooks);
+      
       setShowAddModal(false);
       setNewBook({
         name: "",
         category: "",
-        // type: "",
         language: "",
         quantity: 1,
       });
@@ -114,17 +176,20 @@ const BooksPageAdmin = () => {
   };
 
   const handleDeleteBook = async (id) => {
-  if (!window.confirm("Are you sure you want to delete this book?")) return;
+    if (!window.confirm("Are you sure you want to delete this book?")) return;
 
-  try {
-    await deleteBook(id);
-    setBooks((prevBooks) => prevBooks.filter((book) => book.id !== id));
-  } catch (error) {
-    console.error("Failed to delete book:", error);
-    alert("Failed to delete book. Please try again.");
-  }
-};
-
+    try {
+      await deleteBook(id);
+      const updatedBooks = books.filter((book) => book.id !== id);
+      setBooks(updatedBooks);
+      
+      // Recalculate and store total count
+      calculateAndStoreTotalCount(updatedBooks);
+    } catch (error) {
+      console.error("Failed to delete book:", error);
+      alert("Failed to delete book. Please try again.");
+    }
+  };
 
   return (
     <div className="library-page">
@@ -133,13 +198,19 @@ const BooksPageAdmin = () => {
         <AppBar />
         <br />
 
+
+
         {/* Add Book Button */}
         <div>
           <button onClick={() => setShowAddModal(true)}>+ Add Book</button>
           <div style={{ marginTop: "20px" }}></div>
         </div>
 
-        <BookTable books={books} onEditBook={handleEditBook} onDeleteBook={handleDeleteBook} />
+        <BookTable
+          books={books}
+          onEditBook={handleEditBook}
+          onDeleteBook={handleDeleteBook}
+        />
 
         {/* Add Book Modal */}
         {showAddModal && (
@@ -164,15 +235,6 @@ const BooksPageAdmin = () => {
                   }
                 />
               </label>
-              {/* <label>
-                Type:{" "}
-                <input
-                  value={newBook.type}
-                  onChange={(e) =>
-                    setNewBook({ ...newBook, type: e.target.value })
-                  }
-                />
-              </label> */}
 
               <label>
                 Quantity:{" "}
@@ -182,10 +244,29 @@ const BooksPageAdmin = () => {
                   onChange={(e) =>
                     setNewBook({
                       ...newBook,
-                      quantity: e.target.value, // store as string
+                      quantity: e.target.value,
                     })
                   }
                 />
+              </label>
+              <label>
+                Type:
+                <select
+                  value={newBook.type?.id || ""}
+                  onChange={(e) => {
+                    const selected = bookTypes.find(
+                      (t) => t.id === e.target.value
+                    );
+                    setNewBook({ ...newBook, type: selected });
+                  }}
+                >
+                  <option value="">Select Type</option>
+                  {bookTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                </select>
               </label>
 
               <div className="form-field">
@@ -204,19 +285,6 @@ const BooksPageAdmin = () => {
                     <option value="Tamil">Tamil</option>
                   </select>
                 </label>
-
-                {/* <label>
-                  Availability:
-                  <select
-                    value={newBook.availability}
-                    onChange={(e) =>
-                      setNewBook({ ...newBook, availability: e.target.value })
-                    }
-                  >
-                    <option>Available</option>
-                    <option>Not Available</option>
-                  </select>
-                </label> */}
               </div>
               <div
                 style={{
@@ -261,15 +329,7 @@ const BooksPageAdmin = () => {
                   }
                 />
               </label>
-              <label>
-                Type:{" "}
-                <input
-                  value={editingBook.type}
-                  onChange={(e) =>
-                    setEditingBook({ ...editingBook, type: e.target.value })
-                  }
-                />
-              </label>
+
               <label>
                 Quantity:{" "}
                 <input
@@ -278,10 +338,28 @@ const BooksPageAdmin = () => {
                   onChange={(e) =>
                     setEditingBook({
                       ...editingBook,
-                      quantity: e.target.value, // don't parse yet
+                      quantity: e.target.value,
                     })
                   }
                 />
+              </label>
+
+              <label>
+                Type:
+                <select
+                  value={editingBook.type?.id || ""}
+                  onChange={(e) => {
+                    const selected = bookTypes.find((t) => t.id === e.target.value);
+                    setEditingBook({ ...editingBook, type: selected || { id: "", name: "" } });
+                  }}
+                >
+                  <option value="">Select Type</option>
+                  {bookTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                </select>
               </label>
 
               <div className="form-field">

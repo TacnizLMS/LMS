@@ -217,9 +217,25 @@ h4{
   margin-top: 0;
 }
 
-.modal-contentBook label {
-  display: block;
-  margin-bottom: 10px;
+.modal-contentBook input,
+.modal-contentBook select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #333;
+  outline: none;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.modal-contentBook input:focus,
+.modal-contentBook select:focus {
+  border-color: #555;
 }
 
 
@@ -231,7 +247,8 @@ h4{
   width: 100%;
 }
 
-.form-field label {
+.form-field label,
+.form-field select {
   margin-bottom: 6px;
   font-weight: 500;
   color: #333;

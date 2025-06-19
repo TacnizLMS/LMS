@@ -18,7 +18,7 @@ const Catalog = () => {
 
   const [activeTab, setActiveTab] = useState(tabParam);
 
-  // Get user ID from localStorage 
+  // Get user ID from sessionStorage 
   const getUserId = () => {
     return sessionStorage.getItem("userId"); 
   };
@@ -46,24 +46,49 @@ const Catalog = () => {
     };
 
     fetchCatalogData();
-  }, [activeTab]);
+  }, []); // Remove activeTab dependency to avoid unnecessary re-fetching
 
   // Helper function to check if catalog is expired
   const isCatalogExpired = (catalog) => {
     const now = new Date();
     const expiredDate = new Date(catalog.expiredDate);
-    return expiredDate < now && !catalog.completeState;
+    
+    // Pending catalogs are never considered expired
+    if (catalog.completeState === "pending") {
+      return false;
+    }
+    
+    // Only consider catalogs with "borrow" status as potentially expired
+    // Complete catalogs are never expired
+    if (catalog.completeState === "complete") {
+      return false;
+    }
+    
+    return expiredDate < now;
+  };
+
+  // Helper function to check if catalog is active (not expired and not complete)
+  const isCatalogActive = (catalog) => {
+    // Pending catalogs are always active
+    if (catalog.completeState === "pending") {
+      return true;
+    }
+    
+    return catalog.completeState === "borrow" && !isCatalogExpired(catalog);
   };
 
   // Filter catalogs based on active tab
   const getFilteredCatalogs = () => {
     return catalogs.filter(catalog => {
       if (activeTab === 'active') {
-        return !catalog.completeState && !isCatalogExpired(catalog); // Active/borrowed catalogs (not expired)
+        // Active catalogs: pending status or borrow status and not expired
+        return isCatalogActive(catalog);
       } else if (activeTab === 'expired') {
-        return isCatalogExpired(catalog); // Expired catalogs
+        // Expired catalogs: borrow status but past expiry date (excluding pending)
+        return isCatalogExpired(catalog);
       } else {
-        return catalog.completeState; // Completed/returned catalogs
+        // Completed catalogs: complete status
+        return catalog.completeState === "complete";
       }
     });
   };
@@ -74,13 +99,37 @@ const Catalog = () => {
   };
 
   const getStatusBadge = (catalog) => {
-    if (catalog.completeState) {
-      return <span className="status-badge completed">Returned</span>;
-    } else if (isCatalogExpired(catalog)) {
-      return <span className="status-badge overdue">Overdue</span>;
-    } else {
-      return <span className="status-badge active">Active</span>;
-    }
+    const getStatusClass = (status) => {
+      switch (status) {
+        case "complete":
+          return "completed";
+        case "pending":
+          return "pending";
+        case "borrow":
+          return isCatalogExpired(catalog) ? "overdue" : "active";
+        default:
+          return "active";
+      }
+    };
+
+    const getStatusText = (status) => {
+      switch (status) {
+        case "complete":
+          return "Returned";
+        case "pending":
+          return "Pending";
+        case "borrow":
+          return isCatalogExpired(catalog) ? "Overdue" : "Active";
+        default:
+          return "Active";
+      }
+    };
+
+    return (
+      <span className={`status-badge ${getStatusClass(catalog.completeState)}`}>
+        {getStatusText(catalog.completeState)}
+      </span>
+    );
   };
 
   const getTotalFine = (catalog) => {
@@ -89,9 +138,9 @@ const Catalog = () => {
 
   // Get counts for each tab
   const getCatalogCounts = () => {
-    const activeCatalogs = catalogs.filter(catalog => !catalog.completeState && !isCatalogExpired(catalog));
+    const activeCatalogs = catalogs.filter(catalog => isCatalogActive(catalog));
     const expiredCatalogs = catalogs.filter(catalog => isCatalogExpired(catalog));
-    const completedCatalogs = catalogs.filter(catalog => catalog.completeState);
+    const completedCatalogs = catalogs.filter(catalog => catalog.completeState === "complete");
     
     return {
       active: activeCatalogs.length,
