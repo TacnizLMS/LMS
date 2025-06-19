@@ -82,8 +82,10 @@ role: "User"
 
         console.log("Login message:", data.message);
         decodeJwt();
-        if (data.message === "Login success" && data.jwt !== null) {
-          navigate("/dashboard");
+        if (data.message === "Login success" && data.jwt !== null && payload.roles.includes("Admin")) {
+          navigate("/admin-dashboard");
+        } else if (data.message === "Login success" && data.jwt !== null && payload.roles.includes("User")) {
+          navigate("/user-dashboard");
         }
       } else {
         alert("Login failed please try again.");

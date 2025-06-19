@@ -25,19 +25,31 @@ const Sidebar = () => {
   //   return null; 
   // }
 
-  const menuItems = [
-    { name: "Dashboard", icon: <FaHome />, path: "/dashboard" },
-    { name: "Catalog", icon: <FaLeaf />, path: "/catalog" },
-    { name: "Books", icon: <FaBook />, path: "/books" },
-    // To do: add user role based access control
-    { name: "Fine", icon: <FaMoneyBill />, path: "/fine" },
-    { name: "Admin Dashboard", icon: <FaHome />, path: "/admin-dashboard" },
-    { name: "Catalog Admin", icon: <FaLeaf />, path: "/catalog-admin" },
-    { name: "Books Admin", icon: <FaBook />, path: "/books-admin" },
+  
+    // Helper function to safely get sessionStorage values
+    const getSessionItem = (key, defaultValue) => {
+        const value = sessionStorage.getItem(key);
+        return value !== null && value !== undefined && value !== "undefined" && value !== "null" 
+            ? value 
+            : defaultValue;
+    };
+
+    // Read user info from sessionStorage
+    const role = getSessionItem("role");
+
+  const menuItems = role === "Admin"
+    ? [
+        { name: "Admin Dashboard", icon: <FaHome />, path: "/admin-dashboard" },
+        { name: "Catalog Admin", icon: <FaLeaf />, path: "/catalog-admin" },
+        { name: "Books Admin", icon: <FaBook />, path: "/books-admin" },
         { name: "Users", icon: <FaUsers />, path: "/userPageAdmin" },
-
-
-  ];
+      ]
+    : [
+        { name: "Dashboard", icon: <FaHome />, path: "/dashboard" },
+        { name: "Catalog", icon: <FaLeaf />, path: "/catalog" },
+        { name: "Books", icon: <FaBook />, path: "/books" },
+        { name: "Fine", icon: <FaMoneyBill />, path: "/fine" },
+      ];
 
   return (
     <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
