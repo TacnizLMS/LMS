@@ -4,13 +4,20 @@ import UserTableAdmin from "../../components/userTableAdmin";
 import Sidebar from "../../components/sideBar";
 import AppBar from "../../components/appBar";
 import "../../styling/userPageAdmin.css";
-import { fetchUsers, deleteUser } from "../../services/userService";
+import { fetchUsers, deleteUser, addUser,  } from "../../services/userService";
 
 const UsersPageAdmin = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+ const [showAddModal, setShowAddModal] = useState(false);
+  const [newUser, setNewUser] = useState({
+    email: "",
+    password: "",
+    fullName: "",
+    mobile: "",
+    role: "USER"
+  });
   // Load users when component mounts
   const loadUsers = async () => {
     try {
@@ -53,10 +60,26 @@ const UsersPageAdmin = () => {
 
   // Handle add user
   const handleAddUser = () => {
-    console.log("Add new user");
-    // TODO: Implement add user functionality
-    // You can open a modal or navigate to an add user page
-    // Example: setShowAddModal(true);
+    setShowAddModal(true);
+  };
+
+  // Handle save new user
+  const handleSaveUser = async () => {
+    try {
+      const userData = await addUser(newUser);
+      setUsers([...users, userData]);
+      setShowAddModal(false);
+      setNewUser({
+        email: "",
+        password: "",
+        fullName: "",
+        mobile: "",
+        role: "USER"
+      });
+      alert("User added successfully");
+    } catch (err) {
+      alert("Error adding user: " + err.message);
+    }
   };
 
   return (
@@ -151,8 +174,83 @@ const UsersPageAdmin = () => {
                 onDeleteUser={handleDeleteUser}
               />
             </>
+            
           )}
+          
         </div>
+         {/* Add User Modal */}
+        {showAddModal && (
+          <div className="modal-overlayBook">
+            <div className="modal-contentBook">
+              <h2>Add New User</h2>
+              <label>
+                Full Name:{" "}
+                <input
+                  value={newUser.fullName}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, fullName: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Email:{" "}
+                <input
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, email: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Password:{" "}
+                <input
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, password: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Mobile:{" "}
+                <input
+                  value={newUser.mobile}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, mobile: e.target.value })
+                  }
+                />
+              </label>
+              <div className="form-field">
+                <label>
+                  Role:
+                  <br />
+                  <select
+                    value={newUser.role}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, role: e.target.value })
+                    }
+                  >
+                    <option value="USER">User</option>
+                    <option value="ADMIN">Admin</option>
+                  </select>
+                </label>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "20px",
+                }}
+              >
+                <button onClick={() => setShowAddModal(false)}>Cancel</button>
+                <button onClick={handleSaveUser} style={{ marginLeft: "auto" }}>
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -32,10 +32,10 @@ export const deleteUser = async (userId) => {
   }
 };
 
-// Add new user (you can implement this based on your API)
+// Add new user using signup endpoint
 export const addUser = async (userData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/users`, {
+    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
