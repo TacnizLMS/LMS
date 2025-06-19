@@ -1,16 +1,16 @@
 // pages/UsersAdmin.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import UserTableAdmin from "../../components/userTableAdmin";
 import Sidebar from "../../components/sideBar";
 import AppBar from "../../components/appBar";
 import "../../styling/userPageAdmin.css";
-import { fetchUsers, deleteUser, addUser,  } from "../../services/userService";
+import { fetchUsers, deleteUser, addUser } from "../../services/userService";
 
 const UsersPageAdmin = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
- const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [newUser, setNewUser] = useState({
     email: "",
     password: "",
@@ -18,23 +18,47 @@ const UsersPageAdmin = () => {
     mobile: "",
     role: "USER"
   });
+
+  // Function to store user count in secure storage
+  const storeUserCount = (totalUsers) => {
+    try {
+      const userCountData = {
+        totalCount: totalUsers,
+        totalUsers: totalUsers,
+        lastUpdated: new Date().toISOString(),
+        timestamp: Date.now()
+      };
+
+      // Store in both sessionStorage (more secure) and localStorage (fallback)
+      sessionStorage.setItem("userCount", JSON.stringify(userCountData));
+      localStorage.setItem("userCount", JSON.stringify(userCountData));
+      
+      console.log("User count stored successfully:", totalUsers);
+    } catch (error) {
+      console.error("Error storing user count:", error);
+    }
+  };
+
   // Load users when component mounts
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const userData = await fetchUsers();
       setUsers(userData);
+      
+      // Store the user count after successful fetch
+      storeUserCount(userData.length);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadUsers();
-  }, []);
+  }, [loadUsers]);
 
   // Handle edit user
   const handleEditUser = (user) => {
@@ -50,7 +74,12 @@ const UsersPageAdmin = () => {
       try {
         await deleteUser(userId);
         // Remove user from local state
-        setUsers(users.filter((user) => (user.id || user._id) !== userId));
+        const updatedUsers = users.filter((user) => (user.id || user._id) !== userId);
+        setUsers(updatedUsers);
+        
+        // Update stored user count after deletion
+        storeUserCount(updatedUsers.length);
+        
         alert("User deleted successfully");
       } catch (err) {
         alert("Error deleting user: " + err.message);
@@ -67,7 +96,12 @@ const UsersPageAdmin = () => {
   const handleSaveUser = async () => {
     try {
       const userData = await addUser(newUser);
-      setUsers([...users, userData]);
+      const updatedUsers = [...users, userData];
+      setUsers(updatedUsers);
+      
+      // Update stored user count after addition
+      storeUserCount(updatedUsers.length);
+      
       setShowAddModal(false);
       setNewUser({
         email: "",
@@ -174,11 +208,10 @@ const UsersPageAdmin = () => {
                 onDeleteUser={handleDeleteUser}
               />
             </>
-            
           )}
-          
         </div>
-         {/* Add User Modal */}
+
+        {/* Add User Modal */}
         {showAddModal && (
           <div className="modal-overlayBook">
             <div className="modal-contentBook">

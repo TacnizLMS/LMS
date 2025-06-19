@@ -7,91 +7,140 @@ import { FaBookOpen, FaUser, FaLeaf } from "react-icons/fa";
 import CustomInfoCard from "../../components/customInfoCard";
 
 const DashboardAdmin = () => {
-   const getCatalogCount = () => {
-  try {
-    // Try sessionStorage first (more secure for current session)
-    let catalogCountData = sessionStorage.getItem("catalogCount");
-    
-    // If not found in sessionStorage, try localStorage as fallback
-    if (!catalogCountData) {
-      catalogCountData = localStorage.getItem("catalogCount");
-    }
-    
-    if (catalogCountData) {
-      const parsedData = JSON.parse(catalogCountData);
+  const getCatalogCount = () => {
+    try {
+      // Try sessionStorage first (more secure for current session)
+      let catalogCountData = sessionStorage.getItem("catalogCount");
       
-      // Check if data is not too old (optional: 1 hour expiry)
-      const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
-      const now = Date.now();
-      
-      if (parsedData.timestamp && (now - parsedData.timestamp) < oneHour) {
-        return {
-          count: parsedData.totalCount,
-          lastUpdated: parsedData.lastUpdated,
-          isValid: true
-        };
-      } else {
-        // Data is expired, return with invalid flag
-        return {
-          count: parsedData.totalCount,
-          lastUpdated: parsedData.lastUpdated,
-          isValid: false
-        };
+      // If not found in sessionStorage, try localStorage as fallback
+      if (!catalogCountData) {
+        catalogCountData = localStorage.getItem("catalogCount");
       }
-    }
-    
-    return {
-      count: 0,
-      lastUpdated: null,
-      isValid: false
-    };
-    
-  } catch (error) {
-    console.error("Error retrieving catalog count:", error);
-    return {
-      count: 0,
-      lastUpdated: null,
-      isValid: false
-    };
-  }
-};
-
-const getStoredBookCount = () => {
-  try {
-    // Try sessionStorage first
-    let storedData = sessionStorage.getItem("bookCount");
-    
-    // If not found in sessionStorage, try localStorage
-    if (!storedData) {
-      storedData = localStorage.getItem("bookCount");
-    }
-    
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
+      
+      if (catalogCountData) {
+        const parsedData = JSON.parse(catalogCountData);
+        
+        // Check if data is not too old (optional: 1 hour expiry)
+        const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+        const now = Date.now();
+        
+        if (parsedData.timestamp && (now - parsedData.timestamp) < oneHour) {
+          return {
+            count: parsedData.totalCount,
+            lastUpdated: parsedData.lastUpdated,
+            isValid: true
+          };
+        } else {
+          // Data is expired, return with invalid flag
+          return {
+            count: parsedData.totalCount,
+            lastUpdated: parsedData.lastUpdated,
+            isValid: false
+          };
+        }
+      }
+      
       return {
-        totalCount: parsedData.totalCount || 0,
-        totalBooks: parsedData.totalBooks || 0,
-        lastUpdated: parsedData.lastUpdated,
-        timestamp: parsedData.timestamp
+        count: 0,
+        lastUpdated: null,
+        isValid: false
+      };
+      
+    } catch (error) {
+      console.error("Error retrieving catalog count:", error);
+      return {
+        count: 0,
+        lastUpdated: null,
+        isValid: false
       };
     }
-    
-    return {
-      totalCount: 0,
-      totalBooks: 0,
-      lastUpdated: null,
-      timestamp: null
-    };
-  } catch (error) {
-    console.error("Error loading book count from storage:", error);
-    return {
-      totalCount: 0,
-      totalBooks: 0,
-      lastUpdated: null,
-      timestamp: null
-    };
-  }
-};
+  };
+
+  const getStoredBookCount = () => {
+    try {
+      // Try sessionStorage first
+      let storedData = sessionStorage.getItem("bookCount");
+      
+      // If not found in sessionStorage, try localStorage
+      if (!storedData) {
+        storedData = localStorage.getItem("bookCount");
+      }
+      
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        return {
+          totalCount: parsedData.totalCount || 0,
+          totalBooks: parsedData.totalBooks || 0,
+          lastUpdated: parsedData.lastUpdated,
+          timestamp: parsedData.timestamp
+        };
+      }
+      
+      return {
+        totalCount: 0,
+        totalBooks: 0,
+        lastUpdated: null,
+        timestamp: null
+      };
+    } catch (error) {
+      console.error("Error loading book count from storage:", error);
+      return {
+        totalCount: 0,
+        totalBooks: 0,
+        lastUpdated: null,
+        timestamp: null
+      };
+    }
+  };
+
+  const getStoredUserCount = () => {
+    try {
+      // Try sessionStorage first (more secure for current session)
+      let userCountData = sessionStorage.getItem("userCount");
+      
+      // If not found in sessionStorage, try localStorage as fallback
+      if (!userCountData) {
+        userCountData = localStorage.getItem("userCount");
+      }
+      
+      if (userCountData) {
+        const parsedData = JSON.parse(userCountData);
+        
+        // Check if data is not too old (optional: 1 hour expiry)
+        const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+        const now = Date.now();
+        
+        if (parsedData.timestamp && (now - parsedData.timestamp) < oneHour) {
+          return {
+            count: parsedData.totalUsers || parsedData.totalCount || 0,
+            lastUpdated: parsedData.lastUpdated,
+            isValid: true
+          };
+        } else {
+          // Data is expired, return with invalid flag
+          return {
+            count: parsedData.totalUsers || parsedData.totalCount || 0,
+            lastUpdated: parsedData.lastUpdated,
+            isValid: false
+          };
+        }
+      }
+      
+      return {
+        count: 0,
+        lastUpdated: null,
+        isValid: false
+      };
+      
+    } catch (error) {
+      console.error("Error retrieving user count:", error);
+      return {
+        count: 0,
+        lastUpdated: null,
+        isValid: false
+      };
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -108,9 +157,9 @@ const getStoredBookCount = () => {
           >
             <CustomInfoCard
               icon={<FaUser />}
-              title=""
+              title={`${getStoredUserCount().count} Users`}
               subtitle="Total User Based"
-              to="/catalog"
+              to="/users-admin"
             />
             <CustomInfoCard
               icon={<FaBookOpen />}
