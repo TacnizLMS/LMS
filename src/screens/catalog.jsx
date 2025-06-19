@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from "../components/sideBar";
 import AppBar from "../components/appBar";
-import '../styling/catalog.css'; 
+import '../styling/catalog.css';
 import { useLocation } from 'react-router-dom';
 import { fetchCatalogs } from '../services/catalogService';
 
@@ -14,8 +14,7 @@ const Catalog = () => {
 
   // Extract tab from URL (default to 'active')
   const queryParams = new URLSearchParams(location.search);
-  const tabParam = queryParams.get("tab") || "active";
-
+  const tabParam = queryParams.get("tab") || "pending";
   const [activeTab, setActiveTab] = useState(tabParam);
 
   // Get user ID from sessionStorage 
@@ -52,44 +51,22 @@ const Catalog = () => {
   const isCatalogExpired = (catalog) => {
     const now = new Date();
     const expiredDate = new Date(catalog.expiredDate);
-    
-    // Pending catalogs are never considered expired
-    if (catalog.completeState === "pending") {
-      return false;
-    }
-    
-    // Only consider catalogs with "borrow" status as potentially expired
-    // Complete catalogs are never expired
-    if (catalog.completeState === "complete") {
-      return false;
-    }
-    
+    if (catalog.completeState === "pending" || catalog.completeState === "complete") return false;
     return expiredDate < now;
   };
 
-  // Helper function to check if catalog is active (not expired and not complete)
-  const isCatalogActive = (catalog) => {
-    // Pending catalogs are always active
-    if (catalog.completeState === "pending") {
-      return true;
-    }
-    
-    return catalog.completeState === "borrow" && !isCatalogExpired(catalog);
-  };
-
-  // Filter catalogs based on active tab
   const getFilteredCatalogs = () => {
     return catalogs.filter(catalog => {
-      if (activeTab === 'active') {
-        // Active catalogs: pending status or borrow status and not expired
-        return isCatalogActive(catalog);
+      if (activeTab === 'pending') {
+        return catalog.completeState === "pending";
+      } else if (activeTab === 'active') {
+        return catalog.completeState === "borrow" && !isCatalogExpired(catalog);
       } else if (activeTab === 'expired') {
-        // Expired catalogs: borrow status but past expiry date (excluding pending)
-        return isCatalogExpired(catalog);
-      } else {
-        // Completed catalogs: complete status
+        return catalog.completeState === "borrow" && isCatalogExpired(catalog);
+      } else if (activeTab === 'completed') {
         return catalog.completeState === "complete";
       }
+      return false;
     });
   };
 
@@ -138,15 +115,12 @@ const Catalog = () => {
 
   // Get counts for each tab
   const getCatalogCounts = () => {
-    const activeCatalogs = catalogs.filter(catalog => isCatalogActive(catalog));
-    const expiredCatalogs = catalogs.filter(catalog => isCatalogExpired(catalog));
-    const completedCatalogs = catalogs.filter(catalog => catalog.completeState === "complete");
-    
-    return {
-      active: activeCatalogs.length,
-      expired: expiredCatalogs.length,
-      completed: completedCatalogs.length
-    };
+    const pending = catalogs.filter(c => c.completeState === "pending").length;
+    const active = catalogs.filter(c => c.completeState === "borrow" && !isCatalogExpired(c)).length;
+    const expired = catalogs.filter(c => c.completeState === "borrow" && isCatalogExpired(c)).length;
+    const completed = catalogs.filter(c => c.completeState === "complete").length;
+
+    return { pending, active, expired, completed };
   };
 
   const filteredCatalogs = getFilteredCatalogs();
@@ -159,6 +133,13 @@ const Catalog = () => {
         <AppBar />
         <div className="tabs-container">
           <div className="tab-buttons">
+            <button
+              className={activeTab === 'pending' ? 'active' : ''}
+              onClick={() => setActiveTab('pending')}
+            >
+              Pending Catalogs
+              {catalogCounts.pending > 0 && <span className="tab-count">{catalogCounts.pending}</span>}
+            </button>
             <button
               className={activeTab === 'active' ? 'active' : ''}
               onClick={() => setActiveTab('active')}
@@ -198,7 +179,7 @@ const Catalog = () => {
                   <div key={catalog.id} className="catalog-card">
                     <div className="catalog-header">
                       <div className="catalog-info">
-                        <h3>Catalog ID: {catalog.id.slice(-8)}</h3>
+                        <h3>Catalog ID: {catalog.id}</h3>
                         <p>User ID: {catalog.userId}</p>
                         <p>Total Books: {catalog.quantity}</p>
                         {getStatusBadge(catalog)}
