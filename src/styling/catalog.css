@@ -186,6 +186,7 @@
 }
 
 .catalog-info p {
+    text-align: left;
   margin: 4px 0;
   font-size: 14px;
   opacity: 0.9;
@@ -212,6 +213,11 @@
   font-weight: 600;
   text-transform: uppercase;
   margin-top: 8px;
+}
+
+.status-badge.pending {
+  background-color: #c0ac70;
+  color: black;
 }
 
 .status-badge.active {
