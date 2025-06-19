@@ -13,6 +13,7 @@ import BooksPage from './screens/bookPage';
 import DashboardAdmin from './screens/admin_Pages/dashboardAdmin';
 import CatalogAdmin from './screens/admin_Pages/catalogAdmin';
 import BooksPageAdmin from './screens/admin_Pages/bookPageAdmin';
+import UserPageAdmin from './screens/admin_Pages/userPageAdmin';
 
 function App() {
   return (
@@ -26,15 +27,13 @@ function App() {
       <Route path='/sidebar' element={<Sidebar />} />
       <Route path='/logout' element={<LogoutPopup />} />
       <Route path='/dashboard' element={<Dashboard />} />
-      {/* <Route path='/admin' element={<Admin />} /> */}
       <Route path='/catalog' element={<Catalog />} />
-      {/* <Route path='/borrowers' element={<Borrowers />} /> */}
       <Route path='/books' element={<BooksPage />} />
       <Route path='/admin-dashboard' element={<DashboardAdmin />} />
       <Route path='/catalog-admin' element={<CatalogAdmin />} />
       <Route path='/books-admin' element={<BooksPageAdmin />} />
-      {/* <Route path='/loans' element={<Loans />} /> */}
-      {/* <Route path='/settings' element={<Settings />} /> */}
+      <Route path='/userPageAdmin' element={<UserPageAdmin />} />
+
 
 
     </Routes>
