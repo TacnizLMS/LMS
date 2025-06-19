@@ -167,37 +167,35 @@ export const fetchAllCatalogs = async () => {
 
 
 
-export const updateCatalog = async (catalogId, books) => {
+export const updateCatalog = async (catalogId, completeState) => {
   try {
     const url = `${API_BASE_URL}/catalog/update/${catalogId}`;
     console.log('Updating catalog at:', url);
 
     const token = getAuthToken();
-    console.log('Using token:', token ? `${token.substring(0, 20)}...` : 'No token found');
-
-    // Prepare headers with proper authorization
     const headers = {
       'Content-Type': 'application/json',
     };
-    
+
     if (token) {
-      // Add Bearer prefix if token doesn't already have it
       headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
     }
 
-    console.log('Request headers:', headers);
+    const requestBody = {
+      completeState: completeState, // Only this is sent
+    };
 
-    // Use the prepared headers in the actual fetch request
+    console.log('Sending body:', requestBody);
+
     const response = await fetch(url, {
       method: 'PUT',
-      headers: headers, // Use the prepared headers object
-      body: JSON.stringify({ books }),
+      headers,
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Server response:', response.status, response.statusText, errorText);
-      throw new Error(`Failed to update catalog: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to update catalog: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const result = await response.json();
@@ -208,6 +206,8 @@ export const updateCatalog = async (catalogId, books) => {
     throw error;
   }
 };
+
+
 
 
 export const deleteCatalogById = async (catalogId) => {
