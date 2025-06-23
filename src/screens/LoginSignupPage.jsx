@@ -121,8 +121,8 @@ role: "User"
         </Link>
 
         <center>
-          <button 
-            className="sign-in" 
+          <button
+            className="sign-in"
             onClick={handleSignIn}
             disabled={isLoading}
             style={{
