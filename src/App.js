@@ -10,6 +10,7 @@ import LogoutPopup from './screens/logOutPopUp';
 import Dashboard from './screens/dashboard';
 import Catalog from './screens/catalog';
 import BooksPage from './screens/bookPage';
+import FinePage from './screens/fine';
 import DashboardAdmin from './screens/admin_Pages/dashboardAdmin';
 import CatalogAdmin from './screens/admin_Pages/catalogAdmin';
 import BooksPageAdmin from './screens/admin_Pages/bookPageAdmin';
@@ -29,6 +30,7 @@ function App() {
       <Route path='/dashboard' element={<Dashboard />} />
       <Route path='/catalog' element={<Catalog />} />
       <Route path='/books' element={<BooksPage />} />
+      <Route path='/fine' element={<FinePage />} />
       <Route path='/admin-dashboard' element={<DashboardAdmin />} />
       <Route path='/catalog-admin' element={<CatalogAdmin />} />
       <Route path='/books-admin' element={<BooksPageAdmin />} />
