@@ -1,0 +1,485 @@
+/* Import your existing fine.css styles first */
+
+.library-page {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.main-contentb {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f4f4f4;
+  padding: 20px;
+  overflow-y: auto;
+  background-image: url("../assets/dashBack.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.fine-container {
+  padding: 20px;
+  flex: 1;
+}
+
+.fine-header {
+  background: linear-gradient(135deg, #785c14 0%, #a57d14 100%);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 16px rgba(120, 92, 20, 0.3);
+}
+
+.fine-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fine-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.fine-total {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  color: #fff3cd;
+}
+
+.fine-header-right {
+  text-align: right;
+}
+
+.fine-header-right p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 18px;
+  color: #785c14;
+}
+
+/* Fine Details Section */
+.fine-details-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Tabs Container */
+.tabs-container {
+  padding: 20px;
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 10px;
+}
+
+.tab-buttons button {
+  padding: 12px 24px;
+  border: none;
+  background-color: #ffffff;
+  color: #6c757d;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-buttons button:hover {
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+.tab-buttons button.active {
+  background-color: #785c14;
+  color: white;
+  border-bottom-color: #785c14;
+}
+
+/* Tab Count Badges */
+.tab-count {
+  background-color: #6c757d;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* Tab Button Variations */
+.tab-buttons button.unpaid-tab {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.tab-buttons button.unpaid-tab:hover {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.tab-buttons button.unpaid-tab.active {
+  background-color: #dc3545;
+  color: white;
+  border-bottom-color: #dc3545;
+}
+
+.tab-buttons button.partial-tab {
+  color: #fd7e14;
+  border-color: #fd7e14;
+}
+
+.tab-buttons button.partial-tab:hover {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.tab-buttons button.partial-tab.active {
+  background-color: #fd7e14;
+  color: white;
+  border-bottom-color: #fd7e14;
+}
+
+.tab-buttons button.paid-tab {
+  color: #28a745;
+  border-color: #28a745;
+}
+
+.tab-buttons button.paid-tab:hover {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.tab-buttons button.paid-tab.active {
+  background-color: #28a745;
+  color: white;
+  border-bottom-color: #28a745;
+}
+
+/* Specialized Tab Count Badges */
+.tab-count.unpaid-count {
+  background-color: #dc3545;
+  animation: pulse 2s infinite;
+}
+
+.tab-count.partial-count {
+  background-color: #fd7e14;
+}
+
+.tab-count.paid-count {
+  background-color: #28a745;
+}
+
+.tab-buttons button.unpaid-tab.active .tab-count.unpaid-count,
+.tab-buttons button.partial-tab.active .tab-count.partial-count,
+.tab-buttons button.paid-tab.active .tab-count.paid-count {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Loading States */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 16px;
+  color: #6c757d;
+}
+
+/* Catalogs Container */
+.catalogs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Catalog Card */
+.catalog-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+  border: 1px solid #e9ecef;
+}
+
+.catalog-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Catalog Header */
+.catalog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  background: #785c14;
+  color: white;
+}
+
+.catalog-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+}
+
+.catalog-info p {
+  text-align: left;
+  margin: 4px 0;
+  font-size: 14px;
+  opacity: 0.9;
+  color: white;
+}
+
+.catalog-dates {
+  text-align: right;
+}
+
+.catalog-dates p {
+  margin: 4px 0;
+  font-size: 14px;
+  opacity: 0.9;
+  color: white;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.status-badge.pending {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.status-badge.active {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-badge.overdue {
+  background-color: #dc3545;
+  color: white;
+}
+
+.status-badge.completed {
+  background-color: #28a745;
+  color: white;
+}
+
+/* Fine Amount Styles */
+.fine-amount {
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+.unpaid-fine {
+  color: #ffc107 !important;
+  font-weight: 700 !important;
+}
+
+/* Books List Section */
+.books-list {
+  padding: 20px;
+}
+
+.books-list h4 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Table Styles */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.books-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  margin: 0;
+}
+
+.books-table th {
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 2px solid #dee2e6;
+  font-size: 14px;
+}
+
+.books-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 14px;
+    text-align: left;
+
+  color: #495057;
+}
+
+.books-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.books-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.books-table .fine-amount {
+  color: #dc3545 !important;
+  font-weight: 600 !important;
+}
+
+/* Status Indicators */
+.status-indicator {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-indicator.paid {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-indicator.unpaid {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-indicator.returned {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-indicator.not-returned {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* No Data State */
+.no-data {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.no-data p {
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-contentb {
+    margin-left: 0;
+  }
+  
+  .fine-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .fine-header-right {
+    text-align: center;
+  }
+  
+  .catalog-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .catalog-dates {
+    text-align: left;
+  }
+  
+  .tab-buttons {
+    flex-direction: column;
+  }
+  
+  .tab-buttons button {
+    border-radius: 8px;
+    border-bottom: none;
+    border-left: 3px solid transparent;
+  }
+  
+  .tab-buttons button.active {
+    border-left-color: #785c14;
+    border-bottom: none;
+  }
+  
+  .books-table {
+    font-size: 12px;
+  }
+  
+  .books-table th,
+  .books-table td {
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fine-container {
+    padding: 10px;
+  }
+  
+  .fine-header {
+    padding: 20px;
+  }
+  
+  .tabs-container {
+    padding: 15px;
+  }
+  
+  .catalog-header {
+    padding: 15px;
+  }
+  
+  .books-list {
+    padding: 15px;
+  }
+}
