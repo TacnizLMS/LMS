@@ -69,9 +69,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 200px;
+  height: 50px;
   font-size: 18px;
-  color: #785c14;
+  color: #ffffff;
 }
 
 /* Fine Details Section */
@@ -244,10 +244,8 @@
   color: white;
 }
 
-.catalog-info h3 {
+.catalog-info h3,h4 {
   margin: 0 0 8px 0;
-  font-size: 18px;
-  font-weight: 600;
   color: white;
 }
 
@@ -261,6 +259,9 @@
 
 .catalog-dates {
   text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .catalog-dates p {
@@ -483,3 +484,20 @@
     padding: 15px;
   }
 }
+
+.catalog-pay-button {
+  background-color: rgb(225, 195, 103);
+  color: #856404;
+  padding: 7px 10px;
+  border: black 1px solid;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.catalog-actions {
+  margin-top: 5px;
+}
+

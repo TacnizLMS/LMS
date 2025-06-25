@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../styling/fine.css";
 import Sidebar from "../components/sideBar";
 import AppBar from "../components/appBar";
-import { getUserFinesById } from "../services/fineServiceFile";
+import { getUserFinesById, payFineByCatalogId, payCatalogBookFine } from "../services/fineService";
 import { fetchCatalogs } from '../services/catalogService';
 
 const FinePage = () => {
@@ -70,7 +70,7 @@ const FinePage = () => {
 
     const getFilteredCatalogs = () => {
         const catalogsWithFines = getCatalogsWithFines();
-        
+
         if (activeTab === 'paid') {
             return catalogsWithFines.filter(catalog => isCatalogFullyPaid(catalog));
         } else if (activeTab === 'partial') {
@@ -89,9 +89,9 @@ const FinePage = () => {
     const getStatusBadge = (catalog) => {
         const totalFine = getTotalFine(catalog);
         const unpaidFine = getUnpaidFine(catalog);
-        
+
         if (totalFine === 0) return null;
-        
+
         if (unpaidFine === 0) {
             return <span className="status-badge completed">Fully Paid</span>;
         } else if (unpaidFine === totalFine) {
@@ -106,7 +106,7 @@ const FinePage = () => {
         const paid = catalogsWithFines.filter(catalog => isCatalogFullyPaid(catalog)).length;
         const partial = catalogsWithFines.filter(catalog => isCatalogPartiallyPaid(catalog)).length;
         const unpaid = catalogsWithFines.filter(catalog => isCatalogUnpaid(catalog)).length;
-        
+
         return { paid, partial, unpaid, total: catalogsWithFines.length };
     };
 
@@ -129,7 +129,7 @@ const FinePage = () => {
                                     Remaining <br /> Fines
                                 </h4>
                                 <h5 className="fine-total">
-                                    Rs. {fines}
+                                    {fines <= 0 ? 'Rs. 0.00' : `Rs. ${fines}`}
                                 </h5>
                             </div>
                             <div className="fine-header-right">
@@ -137,7 +137,7 @@ const FinePage = () => {
                             </div>
                         </div>
                     )}
-                    
+
                     <div className="fine-details-section">
                         <div className="tabs-container">
                             <div className="tab-buttons">
@@ -176,60 +176,106 @@ const FinePage = () => {
                                                 <div className="catalog-header">
                                                     <div className="catalog-info">
                                                         <h3>Catalog ID: {catalog.id}</h3>
-                                                        <p>Total Books: {catalog.quantity}</p>
+                                                        <h4>Total Books: {catalog.quantity}</h4>
+                                                        <div>
+                                                            <p className="fine-amount">
+                                                                <strong>Total Fine:</strong> Rs. {getTotalFine(catalog).toFixed(2)}
+                                                            </p>
+                                                        </div>
                                                         {getStatusBadge(catalog)}
                                                     </div>
                                                     <div className="catalog-dates">
                                                         <p><strong>Borrowed:</strong> {formatDate(catalog.borrowDate)}</p>
                                                         <p><strong>Due:</strong> {formatDate(catalog.expiredDate)}</p>
-                                                        <p className="fine-amount">
-                                                            <strong>Total Fine:</strong> Rs. {getTotalFine(catalog).toFixed(2)}
-                                                        </p>
                                                         {getUnpaidFine(catalog) > 0 && (
                                                             <p className="fine-amount unpaid-fine">
                                                                 <strong>Remaining:</strong> Rs. {getUnpaidFine(catalog).toFixed(2)}
                                                             </p>
                                                         )}
+                                                        <div className="catalog-actions">
+                                                            {!isCatalogFullyPaid(catalog) && (
+                                                                <button
+                                                                    className="catalog-pay-button"
+                                                                    onClick={async () => {
+                                                                        const confirmPay = window.confirm(`Do you want to pay the fine for Catalog ID: ${catalog.id}?`);
+                                                                        if (confirmPay) {
+                                                                            const result = await payFineByCatalogId(catalog.id);
+                                                                            console.log("Payment Result:", result);
+                                                                            if (result) {
+                                                                                window.open(result, '_blank');
+                                                                            } else {
+                                                                                alert('Failed to generate payment link.');
+                                                                            }
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Pay Fine
+                                                                </button>
+                                                            )}
+                                                        </div>
+
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="books-list">
                                                     <h4>Books with fines:</h4>
                                                     <div className="table-wrapper">
                                                         <table className="books-table">
                                                             <thead>
                                                                 <tr>
-                                                                    <th>Book ID</th>
+                                                                    <th>Catalog Book ID</th>
                                                                     <th>Title</th>
                                                                     <th>Author</th>
                                                                     <th>Fine Amount</th>
                                                                     <th>Payment Status</th>
                                                                     <th>Return Status</th>
+                                                                    <th>Pay</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 {catalog.catalogBooks
                                                                     .filter(item => item.fine > 0)
                                                                     .map((item) => (
-                                                                    <tr key={item.id}>
-                                                                        <td>{item.book.id}</td>
-                                                                        <td>{item.book.title}</td>
-                                                                        <td>{item.book.author}</td>
-                                                                        <td className="fine-amount">
-                                                                            Rs. {item.fine.toFixed(2)}
-                                                                        </td>
-                                                                        <td>
-                                                                            <span className={`status-indicator ${item.finePaid ? 'paid' : 'unpaid'}`}>
-                                                                                {item.finePaid ? 'Paid' : 'Unpaid'}
-                                                                            </span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span className={`status-indicator ${item.returnState ? 'returned' : 'not-returned'}`}>
-                                                                                {item.returnState ? 'Returned' : 'Not Returned'}
-                                                                            </span>
-                                                                        </td>
-                                                                    </tr>
-                                                                ))}
+                                                                        <tr key={item.id}>
+                                                                            <td>{item.id}</td>
+                                                                            <td>{item.book.title}</td>
+                                                                            <td>{item.book.author}</td>
+                                                                            <td className="fine-amount">
+                                                                                Rs. {item.fine.toFixed(2)}
+                                                                            </td>
+                                                                            <td>
+                                                                                <span className={`status-indicator ${item.finePaid ? 'paid' : 'unpaid'}`}>
+                                                                                    {item.finePaid ? 'Paid' : 'Unpaid'}
+                                                                                </span>
+                                                                            </td>
+                                                                            <td>
+                                                                                <span className={`status-indicator ${item.returnState ? 'returned' : 'not-returned'}`}>
+                                                                                    {item.returnState ? 'Returned' : 'Not Returned'}
+                                                                                </span>
+                                                                            </td>
+                                                                            <td>
+                                                                                {!item.finePaid && (
+                                                                                    <button
+                                                                                        className="pay-button"
+                                                                                        onClick={async () => {
+                                                                                            const confirmPay = window.confirm(`Do you want to pay the fine for catalog book ID: ${item.id}?`);
+                                                                                            if (confirmPay) {
+                                                                                                const result = await payCatalogBookFine(catalog.id, item._id);
+                                                                                                if (result?.startsWith('http')) {
+                                                                                                    window.open(result, '_blank');
+                                                                                                } else {
+                                                                                                    alert('Failed to generate payment link.');
+                                                                                                }
+                                                                                            }
+                                                                                        }}
+                                                                                    >
+                                                                                        Pay-Fine
+                                                                                    </button>
+                                                                                )}
+                                                                            </td>
+
+                                                                        </tr>
+                                                                    ))}
                                                             </tbody>
                                                         </table>
                                                     </div>
