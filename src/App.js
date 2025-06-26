@@ -15,6 +15,7 @@ import DashboardAdmin from './screens/admin_Pages/dashboardAdmin';
 import CatalogAdmin from './screens/admin_Pages/catalogAdmin';
 import BooksPageAdmin from './screens/admin_Pages/bookPageAdmin';
 import UserPageAdmin from './screens/admin_Pages/userPageAdmin';
+import FineAdmin from './screens/admin_Pages/fineAdmin';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
       <Route path='/catalog-admin' element={<CatalogAdmin />} />
       <Route path='/books-admin' element={<BooksPageAdmin />} />
       <Route path='/userPageAdmin' element={<UserPageAdmin />} />
+      <Route path='/admin-fine' element={<FineAdmin />} />
 
 
 

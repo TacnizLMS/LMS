@@ -1,44 +1,47 @@
 import React, { useEffect, useState } from "react";
-import "../styling/fine.css";
-import Sidebar from "../components/sideBar";
-import AppBar from "../components/appBar";
-import { getUserFinesById, payFineByCatalogId, payCatalogBookFine } from "../services/fineService";
-import { fetchCatalogs } from '../services/catalogService';
-import FineHeader from "../screens/user_Fine_Components/fine_header";
+import "../../styling/fine.css";
+import Sidebar from "../../components/sideBar";
+import AppBar from "../../components/appBar";
+import { getUserFinesById, payFineByCatalogId, payCatalogBookFine } from "../../services/fineService";
+import { fetchCatalogs } from '../../services/catalogService';
+import { fetchUsers } from '../../services/userService';
+import FineHeader from "../../screens/user_Fine_Components/fine_header";
+import User from '../../model/userModel'; // Assuming you have a User model
 
 const FinePage = () => {
     const [fines, setFines] = useState([]);
     const [catalogs, setCatalogs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('unpaid');
+    const [users, setUsers] = useState([]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            const userId = sessionStorage.getItem("userId");
-            if (!userId) {
-                console.error("User ID not found");
-                setLoading(false);
-                return;
+useEffect(() => {
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const usersData = await fetchUsers();
+            setUsers(usersData);
+
+            const allCatalogs = [];
+            for (const user of usersData) {
+                const userCatalogs = await fetchCatalogs(user._id);
+                const catalogsArray = Array.isArray(userCatalogs) ? userCatalogs : [userCatalogs];
+                catalogsArray.forEach(cat => {
+                    cat.userId = user._id; // attach user id
+                });
+                allCatalogs.push(...catalogsArray);
             }
+            setCatalogs(allCatalogs);
+        } catch (error) {
+            console.error("Error fetching user-wise catalogs:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-            try {
-                // Fetch fines
-                const fineData = await getUserFinesById(userId);
-                if (fineData) setFines(fineData);
+    fetchData();
+}, []);
 
-                // Fetch catalogs
-                const catalogData = await fetchCatalogs(userId);
-                const catalogsArray = Array.isArray(catalogData) ? catalogData : [catalogData];
-                setCatalogs(catalogsArray);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
 
     // Helper functions
     const getTotalFine = (catalog) => {
