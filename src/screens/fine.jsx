@@ -4,6 +4,7 @@ import Sidebar from "../components/sideBar";
 import AppBar from "../components/appBar";
 import { getUserFinesById, payFineByCatalogId, payCatalogBookFine } from "../services/fineService";
 import { fetchCatalogs } from '../services/catalogService';
+import FineHeader from "../screens/user_Fine_Components/fine_header";
 
 const FinePage = () => {
     const [fines, setFines] = useState([]);
@@ -123,19 +124,7 @@ const FinePage = () => {
                     {loading ? (
                         <div className="loader">Loading...</div>
                     ) : (
-                        <div className="fine-header">
-                            <div className="fine-header-left">
-                                <h4 className="fine-title">
-                                    Remaining <br /> Fines
-                                </h4>
-                                <h5 className="fine-total">
-                                    {fines <= 0 ? 'Rs. 0.00' : `Rs. ${fines}`}
-                                </h5>
-                            </div>
-                            <div className="fine-header-right">
-                                <p>Due Date: 2000 / 12 / 08</p>
-                            </div>
-                        </div>
+                         <FineHeader fines={fines} />
                     )}
 
                     <div className="fine-details-section">
