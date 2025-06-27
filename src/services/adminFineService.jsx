@@ -39,6 +39,7 @@ export async function payCatalogFineByCash(catalogId) {
     if (!response.ok) {
         throw new Error('Failed to pay catalog fine by cash');
     }
+    console.log("Response", response);
     const url = await response.text();
     return url;
 }

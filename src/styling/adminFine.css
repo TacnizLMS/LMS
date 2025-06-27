@@ -736,3 +736,113 @@
         padding: 15px;
     }
 }
+
+.fine-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fae19d;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.fine-header-left h1 {
+  margin: 0;
+}
+
+.fine-header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.fine-total-amount {
+  font-size: 16px;
+  color: #333;
+}
+
+.fine-total-value {
+  color: #d32f2f;
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+.fine-select-user select {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+
+.fine-select-user label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    margin-right: 8px;
+}
+
+.user-fine-count {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(90deg, #fffbe6 0%, #ffc107 100%);
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 15px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.08);
+    margin-top: 5px;
+}
+
+.user-fine-count strong {
+    color: #785c14;
+    letter-spacing: 0.3px;
+}
+
+.fine-count-value {
+    font-weight: bold;
+    color: #d32f2f;
+    font-size: 18px;
+    margin-left: 8px;
+    background: #fff;
+    border-radius: 6px;
+    padding: 3px 10px;
+    box-shadow: 0 1px 4px rgba(33, 150, 243, 0.07);
+    transition: background 0.2s;
+}
+
+.fine-count-value:hover {
+    background: #ffeaea;
+}
+
+.fine-total-amount {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(90deg, #fffbe6 0%, #fff3cd 100%);
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(220, 167, 47, 0.08);
+}
+
+.fine-total-amount strong {
+    color: #785c14;
+    letter-spacing: 0.5px;
+}
+
+.fine-total-value {
+    font-weight: bold;
+    color: #d32f2f;
+    font-size: 20px;
+    margin-left: 8px;
+    background: #fff;
+    border-radius: 6px;
+    padding: 4px 12px;
+    box-shadow: 0 1px 4px rgba(211, 47, 47, 0.07);
+    transition: background 0.2s;
+}
+
+.fine-total-value:hover {
+    background: #ffeaea;
+}

@@ -2,45 +2,50 @@ import React, { useEffect, useState } from "react";
 import "../../styling/fine.css";
 import Sidebar from "../../components/sideBar";
 import AppBar from "../../components/appBar";
-import { getUserFinesById, payFineByCatalogId, payCatalogBookFine } from "../../services/fineService";
+import { payCatalogFineByCash , payCatalogBookFineByCash } from "../../services/adminFineService";
 import { fetchCatalogs } from '../../services/catalogService';
 import { fetchUsers } from '../../services/userService';
-import FineHeader from "../../screens/user_Fine_Components/fine_header";
-import User from '../../model/userModel'; // Assuming you have a User model
+import AdminFineHeader from "./admin_components/adminFineHeader"; // Adjust the import path as necessary
+import { useMemo } from 'react';
+
 
 const FinePage = () => {
-    const [fines, setFines] = useState([]);
     const [catalogs, setCatalogs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('unpaid');
     const [users, setUsers] = useState([]);
-
-useEffect(() => {
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            const usersData = await fetchUsers();
-            setUsers(usersData);
-
-            const allCatalogs = [];
-            for (const user of usersData) {
-                const userCatalogs = await fetchCatalogs(user._id);
-                const catalogsArray = Array.isArray(userCatalogs) ? userCatalogs : [userCatalogs];
-                catalogsArray.forEach(cat => {
-                    cat.userId = user._id; // attach user id
-                });
-                allCatalogs.push(...catalogsArray);
-            }
-            setCatalogs(allCatalogs);
-        } catch (error) {
-            console.error("Error fetching user-wise catalogs:", error);
-        } finally {
-            setLoading(false);
-        }
+    const [selectedUserId, setSelectedUserId] = useState("");
+    const onUserChange = (userId) => {
+        setSelectedUserId(userId);
     };
 
-    fetchData();
-}, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const usersData = await fetchUsers();
+                setUsers(usersData);
+
+                const allCatalogs = [];
+                for (const user of usersData) {
+                    const userCatalogs = await fetchCatalogs(user._id);
+                    const catalogsArray = Array.isArray(userCatalogs) ? userCatalogs : [userCatalogs];
+                    catalogsArray.forEach(cat => {
+                        cat.userId = user._id; // attach user id
+                    });
+                    allCatalogs.push(...catalogsArray);
+                }
+                setCatalogs(allCatalogs);
+            } catch (error) {
+                console.error("Error fetching user-wise catalogs:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
 
 
     // Helper functions
@@ -73,7 +78,10 @@ useEffect(() => {
     };
 
     const getFilteredCatalogs = () => {
-        const catalogsWithFines = getCatalogsWithFines();
+        let catalogsWithFines = getCatalogsWithFines();
+        if (selectedUserId) {
+            catalogsWithFines = catalogsWithFines.filter(c => c.userId === selectedUserId);
+        }
 
         if (activeTab === 'paid') {
             return catalogsWithFines.filter(catalog => isCatalogFullyPaid(catalog));
@@ -84,6 +92,7 @@ useEffect(() => {
         }
         return catalogsWithFines;
     };
+
 
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
@@ -106,7 +115,12 @@ useEffect(() => {
     };
 
     const getCatalogCounts = () => {
-        const catalogsWithFines = getCatalogsWithFines();
+        let catalogsWithFines = getCatalogsWithFines();
+
+        if (selectedUserId) {
+            catalogsWithFines = catalogsWithFines.filter(c => c.userId === selectedUserId);
+        }
+
         const paid = catalogsWithFines.filter(catalog => isCatalogFullyPaid(catalog)).length;
         const partial = catalogsWithFines.filter(catalog => isCatalogPartiallyPaid(catalog)).length;
         const unpaid = catalogsWithFines.filter(catalog => isCatalogUnpaid(catalog)).length;
@@ -115,7 +129,16 @@ useEffect(() => {
     };
 
     const filteredCatalogs = getFilteredCatalogs();
-    const catalogCounts = getCatalogCounts();
+    const catalogCounts = useMemo(() => getCatalogCounts(), [catalogs, selectedUserId]);
+    const totalRemainingFines = getCatalogsWithFines()
+        .reduce((sum, cat) => sum + getUnpaidFine(cat), 0);
+    const selectedUserRemainingFine = useMemo(() => {
+        if (!selectedUserId) return 0;
+        const catalogsWithFines = getCatalogsWithFines().filter(c => c.userId === selectedUserId);
+        return catalogsWithFines.reduce((sum, cat) => sum + getUnpaidFine(cat), 0);
+    }, [catalogs, selectedUserId]);
+
+
 
     return (
         <div className="library-page">
@@ -127,7 +150,16 @@ useEffect(() => {
                     {loading ? (
                         <div className="loader">Loading...</div>
                     ) : (
-                         <FineHeader fines={fines} />
+                        <AdminFineHeader
+                            users={users}
+                            totalRemainingFines={totalRemainingFines}
+                            selectedUserId={selectedUserId}
+                            onUserChange={onUserChange}
+                            // need pass remainin fine count of selected user
+                            selectedUserRemainingFine={selectedUserRemainingFine}
+
+                        />
+
                     )}
 
                     <div className="fine-details-section">
@@ -191,7 +223,7 @@ useEffect(() => {
                                                                     onClick={async () => {
                                                                         const confirmPay = window.confirm(`Do you want to pay the fine for Catalog ID: ${catalog.id}?`);
                                                                         if (confirmPay) {
-                                                                            const result = await payFineByCatalogId(catalog.id);
+                                                                            const result = await payCatalogFineByCash(catalog.id);
                                                                             console.log("Payment Result:", result);
                                                                             if (result) {
                                                                                 window.open(result, '_blank');
@@ -252,7 +284,7 @@ useEffect(() => {
                                                                                         onClick={async () => {
                                                                                             const confirmPay = window.confirm(`Do you want to pay the fine for catalog book ID: ${item.id}?`);
                                                                                             if (confirmPay) {
-                                                                                                const result = await payCatalogBookFine(catalog.id, item._id);
+                                                                                                const result = await payCatalogBookFineByCash(catalog.id, item._id);
                                                                                                 if (result?.startsWith('http')) {
                                                                                                     window.open(result, '_blank');
                                                                                                 } else {
