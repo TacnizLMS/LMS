@@ -40,8 +40,7 @@ export async function payCatalogFineByCash(catalogId) {
         throw new Error('Failed to pay catalog fine by cash');
     }
     console.log("Response", response);
-    const url = await response.text();
-    return url;
+    return response;
 }
 
 export async function payCatalogBookFineByCash(catalogId, catalogBookId) {
@@ -53,6 +52,6 @@ export async function payCatalogBookFineByCash(catalogId, catalogBookId) {
     if (!response.ok) {
         throw new Error('Failed to pay catalog book fine by cash');
     }
-    const url = await response.text();
-    return url;
+    console.log("Response", response);
+    return response;
 }

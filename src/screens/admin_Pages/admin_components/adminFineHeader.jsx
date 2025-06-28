@@ -9,8 +9,8 @@ const AdminFineHeader = ({
   selectedUserRemainingFine: selectedUserFineTotal
 }) => {
   return (
-    <div className="fine-header">
-      <div className="fine-header-left">
+    <div className="admin-fine-header">
+      <div className="admin-fine-header-left">
         <div className="fine-select-user">
           <label htmlFor="userSelect">Select User:</label>
           <select

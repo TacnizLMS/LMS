@@ -37,30 +37,25 @@
 
 .fine-header-left {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 10px;
 }
 
 .fine-title {
-  font-size: 20px;
+  font-size: 22px;
   margin: 0;
   line-height: 1.2;
 }
 
 .fine-total {
-  font-size: 25px;
+  font-size: 22px;
   margin: 0;
   color: #fff3cd;
 }
 
 .fine-header-right {
   text-align: right;
-}
-
-.fine-header-right p {
-  margin: 0;
-  font-size: 14px;
-  opacity: 0.9;
+  margin-top: 10px;
 }
 
 .loader {

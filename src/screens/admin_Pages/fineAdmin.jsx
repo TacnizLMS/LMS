@@ -223,12 +223,11 @@ const FinePage = () => {
                                                                     onClick={async () => {
                                                                         const confirmPay = window.confirm(`Do you want to pay the fine for Catalog ID: ${catalog.id}?`);
                                                                         if (confirmPay) {
-                                                                            const result = await payCatalogFineByCash(catalog.id);
-                                                                            console.log("Payment Result:", result);
-                                                                            if (result) {
-                                                                                window.open(result, '_blank');
-                                                                            } else {
-                                                                                alert('Failed to generate payment link.');
+                                                                            const response = await payCatalogFineByCash(catalog.id);
+                                                                            console.log("Payment Result:", response.status);
+                                                                            if (response.status === 200) {
+                                                                                alert('Fine payment successful!' + catalog.id);
+                                                                                window.location.reload();
                                                                             }
                                                                         }
                                                                     }}
@@ -284,11 +283,10 @@ const FinePage = () => {
                                                                                         onClick={async () => {
                                                                                             const confirmPay = window.confirm(`Do you want to pay the fine for catalog book ID: ${item.id}?`);
                                                                                             if (confirmPay) {
-                                                                                                const result = await payCatalogBookFineByCash(catalog.id, item._id);
-                                                                                                if (result?.startsWith('http')) {
-                                                                                                    window.open(result, '_blank');
-                                                                                                } else {
-                                                                                                    alert('Failed to generate payment link.');
+                                                                                                const response = await payCatalogBookFineByCash(catalog.id, item.id);
+                                                                                                if (response.status === 200) {
+                                                                                                    alert('Fine payment successful!' + item.id);
+                                                                                                    window.location.reload();
                                                                                                 }
                                                                                             }
                                                                                         }}

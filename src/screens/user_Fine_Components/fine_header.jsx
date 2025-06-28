@@ -6,14 +6,13 @@ const FineHeader = ({ fines }) => {
     <div className="fine-header">
       <div className="fine-header-left">
         <h4 className="fine-title">
-          Remaining <br /> Fines
+          Remaining Fines: 
         </h4>
-        <h5 className="fine-total">
+        <h4 className="fine-total">
           {fines <= 0 ? 'Rs. 0.00' : `Rs. ${fines}`}
-        </h5>
+        </h4>
       </div>
       <div className="fine-header-right">
-        <p>Due Date: 2000 / 12 / 08</p>
       </div>
     </div>
   );
