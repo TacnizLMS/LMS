@@ -249,7 +249,7 @@ const FinePage = () => {
                                                                                         onClick={async () => {
                                                                                             const confirmPay = window.confirm(`Do you want to pay the fine for catalog book ID: ${item.id}?`);
                                                                                             if (confirmPay) {
-                                                                                                const result = await payCatalogBookFine(catalog.id, item._id);
+                                                                                                const result = await payCatalogBookFine(catalog.id, item.id);
                                                                                                 if (result?.startsWith('http')) {
                                                                                                     window.open(result, '_blank');
                                                                                                 } else {
