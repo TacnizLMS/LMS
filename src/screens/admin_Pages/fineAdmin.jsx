@@ -5,7 +5,7 @@ import AppBar from "../../components/appBar";
 import { payCatalogFineByCash , payCatalogBookFineByCash } from "../../services/adminFineService";
 import { fetchCatalogs } from '../../services/catalogService';
 import { fetchUsers } from '../../services/userService';
-import AdminFineHeader from "./admin_components/adminFineHeader"; // Adjust the import path as necessary
+import AdminFineHeader from "./admin_components/adminFineHeader"; 
 import { useMemo } from 'react';
 
 

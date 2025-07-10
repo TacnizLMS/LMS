@@ -60,7 +60,7 @@ const BooksPageAdmin = () => {
         book.type?.name ||
         (typeof book.type === "string" ? book.type : "Unknown"),
       language: book.language,
-      quantity: book.quantity || 0,
+      availablequantity: book.availableCount || 0,
       availability: availabilityToString(book.availability),
       availabilityBoolean: book.availability,
     };

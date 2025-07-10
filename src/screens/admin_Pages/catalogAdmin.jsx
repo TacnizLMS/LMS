@@ -8,6 +8,8 @@ import {
   returnBackCatalog as returnBackCatalogAPI
 } from "../../services/catalogService";
 import { FaEdit, FaTrash, FaUndo, FaRedo } from "react-icons/fa";
+import { PiHandTapDuotone } from "react-icons/pi";
+
 
 const CatalogAdmin = () => {
   const [catalogs, setCatalogs] = useState([]);
@@ -349,17 +351,23 @@ const CatalogAdmin = () => {
     };
 
     return (
-      <span
-        className={`status-badge ${getStatusClass(catalog.completeState)} ${catalog.completeState !== "complete" ? "clickable-status" : ""}`}
-        onClick={() => catalog.completeState !== "complete" && handleStatusProgression(catalog.id)}
-        title={getNextStatusText(catalog.completeState)}
-        style={{
-          cursor: catalog.completeState !== "complete" ? "pointer" : "default",
-          userSelect: "none"
-        }}
-      >
-        {getStatusText(catalog.completeState)}
-      </span>
+     <span
+  className={`status-badge ${getStatusClass(catalog.completeState)} ${catalog.completeState !== "complete" ? "clickable-status" : ""}`}
+  onClick={() => catalog.completeState !== "complete" && handleStatusProgression(catalog.id)}
+  title={getNextStatusText(catalog.completeState)}
+  style={{
+    cursor: catalog.completeState !== "complete" ? "pointer" : "default",
+    userSelect: "none",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px", // space between icon and text
+    fontSize: "16px",
+  }}
+>
+<PiHandTapDuotone size={20} />
+  {getStatusText(catalog.completeState)}
+</span>
+
     );
   };
 
@@ -610,7 +618,7 @@ const CatalogAdmin = () => {
                         {(activeTab === "active" || activeTab === "expired") &&
                           catalog.catalogBooks.some(book => !book.returnState) && (
                             <button
-                              className="return-all-btn"
+                              className="return-</div>all-btn"
                               onClick={() => returnAllBooks(catalog.id)}
                               title="Return all books in this catalog"
                             >
@@ -792,16 +800,7 @@ const CatalogAdmin = () => {
                                         {item.returnState ? "Returned" : "Not Returned"}
                                       </span>
 
-                                      {/* Show edit icon for all tabs */}
-                                      <FaEdit
-                                        className="edit-icon"
-                                        onClick={() =>
-                                          setEditingReturn({
-                                            catalogId: catalog.id,
-                                            bookId: item.id,
-                                          })
-                                        }
-                                      />
+                                  
                                     </div>
                                   )}
                                 </td>
