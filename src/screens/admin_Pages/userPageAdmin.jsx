@@ -20,6 +20,9 @@ const UsersPageAdmin = () => {
   });
   const [selectedUser, setSelectedUser] = useState(null);
 const [showEditModal, setShowEditModal] = useState(false);
+  // Spinner state for Add and Update buttons
+  const [isSaving, setIsSaving] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
 
   // Function to store user count in secure storage
@@ -119,12 +122,8 @@ const handleUpdateUser = async () => {
   // Handle save new user
   const handleSaveUser = async () => {
     try {
-      const userData = await addUser(newUser);
-      const updatedUsers = [...users, userData];
-      setUsers(updatedUsers);
-      
-      // Update stored user count after addition
-      storeUserCount(updatedUsers.length);
+      await addUser(newUser);
+      await loadUsers();
       
       setShowAddModal(false);
       setNewUser({
@@ -139,6 +138,8 @@ const handleUpdateUser = async () => {
       alert("Error adding user: " + err.message);
     }
   };
+
+
 
   return (
     <div className="admin-layout">
@@ -170,6 +171,7 @@ const handleUpdateUser = async () => {
                 fontWeight: "bold",
               }}
             >
+              
               + Add User
             </button>
 
@@ -300,80 +302,182 @@ const handleUpdateUser = async () => {
                   marginTop: "20px",
                 }}
               >
-                <button onClick={() => setShowAddModal(false)}>Cancel</button>
-                <button onClick={handleSaveUser} style={{ marginLeft: "auto" }}>
-                  Save
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  disabled={isSaving}
+                  style={{
+                    backgroundColor: isSaving ? "grey" : "#8b6c2f",
+                    color: "white",
+                    border: "none",
+                    padding: "10px 20px",
+                    borderRadius: "5px",
+                    cursor: isSaving ? "not-allowed" : "pointer",
+                    fontSize: "14px",
+                    fontWeight: "bold"
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    setIsSaving(true);
+                    await handleSaveUser();
+                    setIsSaving(false);
+                  }}
+                  style={{
+                    marginLeft: "auto",
+                    backgroundColor: isSaving ? "grey" : "#8b6c2f",
+                    color: "white",
+                    border: "none",
+                    padding: "10px 20px",
+                    borderRadius: "5px",
+                    cursor: isSaving ? "not-allowed" : "pointer",
+                    fontSize: "14px",
+                    fontWeight: "bold"
+                  }}
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <span>
+                      <span className="spinner" style={{
+                        display: "inline-block",
+                        width: "16px",
+                        height: "16px",
+                        border: "2px solid #fff",
+                        borderTop: "2px solid #8b6c2f",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite",
+                        marginRight: "8px",
+                        verticalAlign: "middle"
+                      }} />
+                      Saving...
+                    </span>
+                  ) : (
+                    "Save"
+                  )}
                 </button>
               </div>
             </div>
           </div>
         )}
         {showEditModal && selectedUser && (
-  <div className="modal-overlayBook">
-    <div className="modal-contentBook">
-      <h2>Edit User</h2>
-      <label>
-        Full Name:{" "}
-        <input
-          value={selectedUser.fullName}
-          onChange={(e) =>
-            setSelectedUser({ ...selectedUser, fullName: e.target.value })
-          }
-        />
-      </label>
-      <label>
-        Email:{" "}
-        <input
-          type="email"
-          value={selectedUser.email}
-          onChange={(e) =>
-            setSelectedUser({ ...selectedUser, email: e.target.value })
-          }
-        />
-      </label>
-      <label>
-        Mobile:{" "}
-        <input
-          value={selectedUser.mobile}
-          onChange={(e) =>
-            setSelectedUser({ ...selectedUser, mobile: e.target.value })
-          }
-        />
-      </label>
-      <div className="form-field">
-        <label>
-          Role:
-          <br />
-          <select
-            value={selectedUser.role}
-            onChange={(e) =>
-              setSelectedUser({ ...selectedUser, role: e.target.value })
-            }
-          >
-            <option value="USER">User</option>
-            <option value="ADMIN">Admin</option>
-          </select>
-        </label>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginTop: "20px",
-        }}
-      >
-        <button onClick={() => setShowEditModal(false)}>Cancel</button>
-        <button onClick={handleUpdateUser} style={{ marginLeft: "auto" }}>
-          Update
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+          <div className="modal-overlayBook">
+            <div className="modal-contentBook">
+              <h2>Edit User</h2>
+              <label>
+                Full Name:{" "}
+                <input
+                  value={selectedUser.fullName}
+                  onChange={(e) =>
+                    setSelectedUser({ ...selectedUser, fullName: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Email:{" "}
+                <input
+                  type="email"
+                  value={selectedUser.email}
+                  onChange={(e) =>
+                    setSelectedUser({ ...selectedUser, email: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Mobile:{" "}
+                <input
+                  value={selectedUser.mobile}
+                  onChange={(e) =>
+                    setSelectedUser({ ...selectedUser, mobile: e.target.value })
+                  }
+                />
+              </label>
+              <div className="form-field">
+                <label>
+                  Role:
+                  <br />
+                  <select
+                    value={selectedUser.role}
+                    onChange={(e) =>
+                      setSelectedUser({ ...selectedUser, role: e.target.value })
+                    }
+                  >
+                    <option value="USER">User</option>
+                    <option value="ADMIN">Admin</option>
+                  </select>
+                </label>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "20px",
+                }}
+              >
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  disabled={isUpdating}
+                  style={{
+                    backgroundColor: isUpdating ? "grey" : "#8b6c2f",
+                    color: "white",
+                    border: "none",
+                    padding: "10px 20px",
+                    borderRadius: "5px",
+                    cursor: isUpdating ? "not-allowed" : "pointer",
+                    fontSize: "14px",
+                    fontWeight: "bold"
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    setIsUpdating(true);
+                    await handleUpdateUser();
+                    setIsUpdating(false);
+                  }}
+                  style={{
+                    marginLeft: "auto",
+                    backgroundColor: isUpdating ? "grey" : "#8b6c2f",
+                    color: "white",
+                    border: "none",
+                    padding: "10px 20px",
+                    borderRadius: "5px",
+                    cursor: isUpdating ? "not-allowed" : "pointer",
+                    fontSize: "14px",
+                    fontWeight: "bold"
+                  }}
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? (
+                    <span>
+                      <span className="spinner" style={{
+                        display: "inline-block",
+                        width: "16px",
+                        height: "16px",
+                        border: "2px solid #fff",
+                        borderTop: "2px solid #8b6c2f",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite",
+                        marginRight: "8px",
+                        verticalAlign: "middle"
+                      }} />
+                      Updating...
+                    </span>
+                  ) : (
+                    "Update"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
   );
+
+
 };
 
 export default UsersPageAdmin;
