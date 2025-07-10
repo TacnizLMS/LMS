@@ -11,6 +11,11 @@ import BookTable from "../../components/bookTableAdmin";
 import Sidebar from "../../components/sideBar";
 import AppBar from "../../components/appBar";
 import "../../styling/book.css";
+import {
+  showSuccess,
+  showError,
+  confirmDialog,
+} from "../../utils/alertUtil"; 
 
 // Store book count in secure storage
 const storeBookCount = (totalCount, totalBooks) => {
@@ -19,16 +24,16 @@ const storeBookCount = (totalCount, totalBooks) => {
       totalCount: totalCount,
       totalBooks: totalBooks,
       lastUpdated: new Date().toISOString(),
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     // Store in sessionStorage (secure for session-based storage)
     sessionStorage.setItem("bookCount", JSON.stringify(bookCountData));
-    
+
     // Also store in a more persistent way if needed (optional)
     // You can use encrypted localStorage or a secure storage solution
     localStorage.setItem("bookCount", JSON.stringify(bookCountData));
-    
+
     console.log("Book count stored:", bookCountData);
   } catch (error) {
     console.error("Error storing book count:", error);
@@ -72,10 +77,10 @@ const BooksPageAdmin = () => {
       const quantity = parseInt(book.quantity) || 0;
       return sum + quantity;
     }, 0);
-    
+
     // Store book count using the secure storage function
     storeBookCount(totalCount, booksList.length);
-    
+
     return totalCount;
   };
 
@@ -87,7 +92,7 @@ const BooksPageAdmin = () => {
         calculateAndStoreTotalCount(fetchedBooks);
       })
       .catch(console.error);
-    
+
     const loadBookTypes = async () => {
       try {
         const types = await fetchBookTypes();
@@ -137,18 +142,19 @@ const BooksPageAdmin = () => {
       const updatedBooks = books.map((book) =>
         book.id === editingBook.id ? transformedBook : book
       );
-      
+
       setBooks(updatedBooks);
-      
+
       // Recalculate and store total count
       calculateAndStoreTotalCount(updatedBooks);
 
       setShowEditModal(false);
       setEditingBook(null);
       setOriginalBook(null);
+      await showSuccess("Book updated successfully!");
     } catch (error) {
       console.error("Failed to update book:", error);
-      alert("Failed to update book. Please try again.");
+      await showError("Failed to update book. Please try again.");
     }
   };
 
@@ -158,10 +164,10 @@ const BooksPageAdmin = () => {
 
       const updatedBooks = [...books, createdBook];
       setBooks(updatedBooks);
-      
+
       // Recalculate and store total count
       calculateAndStoreTotalCount(updatedBooks);
-      
+
       setShowAddModal(false);
       setNewBook({
         name: "",
@@ -169,25 +175,27 @@ const BooksPageAdmin = () => {
         language: "",
         quantity: 1,
       });
+      await showSuccess("Book added successfully!");
     } catch (error) {
       console.error("Failed to add book:", error);
-      alert("Failed to add book. Please try again.");
+      await showError("Failed to add book. Please try again.");
     }
   };
 
   const handleDeleteBook = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this book?")) return;
+    if (await confirmDialog("Are you sure you want to delete this book?")) {
+      try {
+        await deleteBook(id);
+        const updatedBooks = books.filter((book) => book.id !== id);
+        setBooks(updatedBooks);
 
-    try {
-      await deleteBook(id);
-      const updatedBooks = books.filter((book) => book.id !== id);
-      setBooks(updatedBooks);
-      
-      // Recalculate and store total count
-      calculateAndStoreTotalCount(updatedBooks);
-    } catch (error) {
-      console.error("Failed to delete book:", error);
-      alert("Failed to delete book. Please try again.");
+        // Recalculate and store total count
+        calculateAndStoreTotalCount(updatedBooks);
+        await showSuccess("Book deleted successfully!");
+      } catch (error) {
+        console.error("Failed to delete book:", error);
+        await showError("Failed to delete book. Please try again.");
+      }
     }
   };
 
@@ -197,8 +205,6 @@ const BooksPageAdmin = () => {
       <div className="main-contentb">
         <AppBar />
         <br />
-
-
 
         {/* Add Book Button */}
         <div>
@@ -349,8 +355,13 @@ const BooksPageAdmin = () => {
                 <select
                   value={editingBook.type?.id || ""}
                   onChange={(e) => {
-                    const selected = bookTypes.find((t) => t.id === e.target.value);
-                    setEditingBook({ ...editingBook, type: selected || { id: "", name: "" } });
+                    const selected = bookTypes.find(
+                      (t) => t.id === e.target.value
+                    );
+                    setEditingBook({
+                      ...editingBook,
+                      type: selected || { id: "", name: "" },
+                    });
                   }}
                 >
                   <option value="">Select Type</option>
