@@ -108,7 +108,7 @@ const UsersPageAdmin = () => {
         password: "",
         fullName: "",
         mobile: "",
-        role: "USER"
+        role: ""
       });
       alert("User added successfully");
     } catch (err) {
