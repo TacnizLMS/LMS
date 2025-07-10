@@ -23,6 +23,7 @@ const [showEditModal, setShowEditModal] = useState(false);
   // Spinner state for Add and Update buttons
   const [isSaving, setIsSaving] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+const [isDeleting, setIsDeleting] = useState(false);
 
 
   // Function to store user count in secure storage
@@ -97,22 +98,23 @@ const handleUpdateUser = async () => {
 
   // Handle delete user
   const handleDeleteUser = async (userId) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      try {
-        await deleteUser(userId);
-        // Remove user from local state
-        const updatedUsers = users.filter((user) => (user.id || user._id) !== userId);
-        setUsers(updatedUsers);
-        
-        // Update stored user count after deletion
-        storeUserCount(updatedUsers.length);
-        
-        alert("User deleted successfully");
-      } catch (err) {
-        alert("Error deleting user: " + err.message);
-      }
+  if (window.confirm("Are you sure you want to delete this user?")) {
+    try {
+      setIsDeleting(true); // Show full-page spinner
+      await deleteUser(userId);
+
+      const updatedUsers = users.filter((user) => (user.id || user._id) !== userId);
+      setUsers(updatedUsers);
+      storeUserCount(updatedUsers.length);
+
+      alert("User deleted successfully");
+    } catch (err) {
+      alert("Error deleting user: " + err.message);
+    } finally {
+      setIsDeleting(false); // Hide spinner after operation
     }
-  };
+  }
+};
 
   // Handle add user
   const handleAddUser = () => {
@@ -472,6 +474,28 @@ const handleUpdateUser = async () => {
             </div>
           </div>
         )}
+{isDeleting && (
+  <div style={{
+    position: "fixed",
+    top: 0, left: 0,
+    width: "100vw",
+    height: "100vh",
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 9999
+  }}>
+    <div className="spinner" style={{
+      width: "40px",
+      height: "40px",
+      border: "4px solid #ccc",
+      borderTop: "4px solid #8b6c2f",
+      borderRadius: "50%",
+      animation: "spin 1s linear infinite"
+    }}></div>
+  </div>
+)}
 
       </div>
     </div>
