@@ -5,6 +5,7 @@ import Sidebar from "../../components/sideBar";
 import AppBar from "../../components/appBar";
 import "../../styling/userPageAdmin.css";
 import { fetchUsers, deleteUser, addUser,updateUser } from "../../services/userService";
+import { showSuccess, showError,confirmDialog} from "../../utils/alertUtil"; // Assuming you have a confirm dialog component
 
 const UsersPageAdmin = () => {
   const [users, setUsers] = useState([]);
@@ -90,31 +91,42 @@ const handleUpdateUser = async () => {
 
     setShowEditModal(false);
     setSelectedUser(null);
-    alert("User updated successfully");
+await showSuccess("User updated successfully");
   } catch (err) {
-    alert("Error updating user: " + err.message);
-  }
+    await showError("Error updating user: " + err.message);}
 };
 
   // Handle delete user
-  const handleDeleteUser = async (userId) => {
-  if (window.confirm("Are you sure you want to delete this user?")) {
-    try {
-      setIsDeleting(true); // Show full-page spinner
-      await deleteUser(userId);
+const handleDeleteUser = async (userId) => {
+  if (await confirmDialog("Are you sure you want to delete this user?")) {
+    setIsDeleting(true);
 
-      const updatedUsers = users.filter((user) => (user.id || user._id) !== userId);
+    let success = false;
+
+    try {
+      await deleteUser(userId);
+      const updatedUsers = users.filter(
+        (user) => (user.id || user._id) !== userId
+      );
       setUsers(updatedUsers);
       storeUserCount(updatedUsers.length);
 
-      alert("User deleted successfully");
+      success = true;
     } catch (err) {
-      alert("Error deleting user: " + err.message);
+      await showError("Error deleting user: " + err.message);
     } finally {
-      setIsDeleting(false); // Hide spinner after operation
+      setIsDeleting(false);
+      console.log(">>> Spinner turned off");
+    }
+
+    if (success) {
+      await showSuccess("User deleted successfully");
     }
   }
 };
+
+
+
 
   // Handle add user
   const handleAddUser = () => {
@@ -135,9 +147,9 @@ const handleUpdateUser = async () => {
         mobile: "",
         role: ""
       });
-      alert("User added successfully");
+      await showSuccess("User added successfully");
     } catch (err) {
-      alert("Error adding user: " + err.message);
+      await showError("Error adding user: " + err.message);
     }
   };
 
