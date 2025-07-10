@@ -4,7 +4,7 @@ import UserTableAdmin from "../../components/userTableAdmin";
 import Sidebar from "../../components/sideBar";
 import AppBar from "../../components/appBar";
 import "../../styling/userPageAdmin.css";
-import { fetchUsers, deleteUser, addUser } from "../../services/userService";
+import { fetchUsers, deleteUser, addUser,updateUser } from "../../services/userService";
 
 const UsersPageAdmin = () => {
   const [users, setUsers] = useState([]);
@@ -18,6 +18,9 @@ const UsersPageAdmin = () => {
     mobile: "",
     role: "USER"
   });
+  const [selectedUser, setSelectedUser] = useState(null);
+const [showEditModal, setShowEditModal] = useState(false);
+
 
   // Function to store user count in secure storage
   const storeUserCount = (totalUsers) => {
@@ -61,12 +64,33 @@ const UsersPageAdmin = () => {
   }, [loadUsers]);
 
   // Handle edit user
-  const handleEditUser = (user) => {
-    console.log("Edit user:", user);
-    // TODO: Implement edit functionality
-    // You can open a modal or navigate to an edit page
-    // Example: setSelectedUser(user); setShowEditModal(true);
-  };
+ const handleEditUser = (user) => {
+  setSelectedUser(user);
+  setShowEditModal(true);
+};
+
+
+const handleUpdateUser = async () => {
+  try {
+    const updated = await updateUser(selectedUser.id || selectedUser._id, {
+      fullName: selectedUser.fullName,
+      mobile: selectedUser.mobile,
+      email: selectedUser.email,
+      role: selectedUser.role,
+    });
+
+    const updatedUsers = users.map((user) =>
+      (user.id || user._id) === updated.id ? updated : user
+    );
+    setUsers(updatedUsers);
+
+    setShowEditModal(false);
+    setSelectedUser(null);
+    alert("User updated successfully");
+  } catch (err) {
+    alert("Error updating user: " + err.message);
+  }
+};
 
   // Handle delete user
   const handleDeleteUser = async (userId) => {
@@ -284,6 +308,69 @@ const UsersPageAdmin = () => {
             </div>
           </div>
         )}
+        {showEditModal && selectedUser && (
+  <div className="modal-overlayBook">
+    <div className="modal-contentBook">
+      <h2>Edit User</h2>
+      <label>
+        Full Name:{" "}
+        <input
+          value={selectedUser.fullName}
+          onChange={(e) =>
+            setSelectedUser({ ...selectedUser, fullName: e.target.value })
+          }
+        />
+      </label>
+      <label>
+        Email:{" "}
+        <input
+          type="email"
+          value={selectedUser.email}
+          onChange={(e) =>
+            setSelectedUser({ ...selectedUser, email: e.target.value })
+          }
+        />
+      </label>
+      <label>
+        Mobile:{" "}
+        <input
+          value={selectedUser.mobile}
+          onChange={(e) =>
+            setSelectedUser({ ...selectedUser, mobile: e.target.value })
+          }
+        />
+      </label>
+      <div className="form-field">
+        <label>
+          Role:
+          <br />
+          <select
+            value={selectedUser.role}
+            onChange={(e) =>
+              setSelectedUser({ ...selectedUser, role: e.target.value })
+            }
+          >
+            <option value="USER">User</option>
+            <option value="ADMIN">Admin</option>
+          </select>
+        </label>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "20px",
+        }}
+      >
+        <button onClick={() => setShowEditModal(false)}>Cancel</button>
+        <button onClick={handleUpdateUser} style={{ marginLeft: "auto" }}>
+          Update
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
       </div>
     </div>
   );
