@@ -5,11 +5,11 @@ const BookTableAdmin = ({ books, onEditBook, onDeleteBook }) => {
   // Helper function to safely render values
   const safeRender = (value) => {
     if (value === null || value === undefined) {
-      return 'N/A';
+      return "N/A";
     }
-    if (typeof value === 'object') {
+    if (typeof value === "object") {
       // If it's an object, try to extract meaningful info or stringify it
-      return value.name || value.title || JSON.stringify(value) || 'Unknown';
+      return value.name || value.title || JSON.stringify(value) || "Unknown";
     }
     return String(value);
   };
@@ -38,7 +38,7 @@ const BookTableAdmin = ({ books, onEditBook, onDeleteBook }) => {
                 <td>{safeRender(book.category)}</td>
                 <td>{safeRender(book.type)}</td>
                 <td>{safeRender(book.language)}</td>
-                <td>{safeRender(book.quantity)}</td>
+                <td>{book.availableCount}</td>
                 <td>
                   <span
                     className={`availability-status ${
@@ -86,7 +86,7 @@ const BookTableAdmin = ({ books, onEditBook, onDeleteBook }) => {
                       marginRight: 8,
                       color: "black",
                     }}
-onClick={() => onDeleteBook(book.id)}
+                    onClick={() => onDeleteBook(book.id)}
                   >
                     <svg
                       width="18"
@@ -104,7 +104,6 @@ onClick={() => onDeleteBook(book.id)}
                       <line x1="14" y1="11" x2="14" y2="17" />
                     </svg>
                   </button>
-                  
                 </td>
               </tr>
             ))

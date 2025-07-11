@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import "../styling/LoginSignupPage.css";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import {
+  showSuccess,
+  showError,
+  confirmDialog,
+} from "../utils/alertUtil";
 
 const LoginSignupPage = () => {
   const [emailError, setEmailError] = useState("");
@@ -88,7 +93,7 @@ role: "User"
           navigate("/dashboard");
         }
       } else {
-        alert("Login failed please try again.");
+        await showError(data.message || "Login failed. Please try again.");
         console.error("Login failed:", data.message);
       }
     } catch (error) {

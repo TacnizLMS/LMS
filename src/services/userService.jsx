@@ -18,7 +18,7 @@ export const fetchUsers = async () => {
 // Delete user by ID
 export const deleteUser = async (userId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/users/${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/auth/delete/${userId}`, {
       method: "DELETE",
     });
     
@@ -57,7 +57,7 @@ export const addUser = async (userData) => {
 // Update user (you can implement this based on your API)
 export const updateUser = async (userId, userData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/users/${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/auth/update/${userId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
