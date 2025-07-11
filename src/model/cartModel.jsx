@@ -3,6 +3,7 @@ import "../styling/book.css";
 import { IoClose } from "react-icons/io5";
 import { FiShoppingCart } from "react-icons/fi";
 import { createCatalog } from "../services/catalogService";
+import { showSuccess, showError, confirmDialog } from "../utils/alertUtil";
 
 const CartModal = ({
   cartItems,
@@ -24,12 +25,12 @@ const CartModal = ({
         books: booksPayload,
       });
 
-      alert("Catalog created successfully!");
+      await showSuccess("Catalog created successfully!");
+      window.location.reload();
       onClose(); // Close the modal
     } catch (error) {
       console.error("Failed to create catalog:", error);
-      alert("Failed to create catalog. Please try again.");
-    }
+  await showError("Failed to create catalog. Please try again.");}
   };
 
   return (
