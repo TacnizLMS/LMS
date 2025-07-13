@@ -7,6 +7,11 @@ import { fetchCatalogs } from '../../services/catalogService';
 import { fetchUsers } from '../../services/userService';
 import AdminFineHeader from "./admin_components/adminFineHeader"; 
 import { useMemo } from 'react';
+import {
+  showSuccess,
+  showError,
+  confirmDialog,
+} from "../../utils/alertUtil"; 
 
 
 const FinePage = () => {
@@ -221,12 +226,12 @@ const FinePage = () => {
                                                                 <button
                                                                     className="catalog-pay-button"
                                                                     onClick={async () => {
-                                                                        const confirmPay = window.confirm(`Do you want to pay the fine for Catalog ID: ${catalog.id}?`);
+                                                                        const confirmPay = await confirmDialog(`Do you want to pay the fine for Catalog ID: ${catalog.id}?`);
                                                                         if (confirmPay) {
                                                                             const response = await payCatalogFineByCash(catalog.id);
                                                                             console.log("Payment Result:", response.status);
                                                                             if (response.status === 200) {
-                                                                                alert('Fine payment successful!' + catalog.id);
+                                                                                await showSuccess("Fine payment successful! \n Catalog: " + catalog.id);
                                                                                 window.location.reload();
                                                                             }
                                                                         }
@@ -281,11 +286,11 @@ const FinePage = () => {
                                                                                     <button
                                                                                         className="pay-button"
                                                                                         onClick={async () => {
-                                                                                            const confirmPay = window.confirm(`Do you want to pay the fine for catalog book ID: ${item.id}?`);
+                                                                                            const confirmPay = await confirmDialog(`Do you want to pay the fine for Catalog Book ID: ${item.id}?`)
                                                                                             if (confirmPay) {
                                                                                                 const response = await payCatalogBookFineByCash(catalog.id, item.id);
                                                                                                 if (response.status === 200) {
-                                                                                                    alert('Fine payment successful!' + item.id);
+                                                                                                    await showSuccess("Fine payment successful! \n Catalog Book: " + item.id);
                                                                                                     window.location.reload();
                                                                                                 }
                                                                                             }
