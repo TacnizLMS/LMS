@@ -1,6 +1,6 @@
 // services/bookService.js
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'https://libraymanagementsystem-production.up.railway.app/api';
 
 // Helper functions for availability conversion
 const availabilityToString = (booleanValue) => {
@@ -298,7 +298,7 @@ export const deleteBook = async (id) => {
 
   const bearerToken = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
 
-  const response = await fetch(`http://localhost:8080/api/books/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/books/${id}`, {
     method: "DELETE",
     headers: {
       "Authorization": bearerToken,

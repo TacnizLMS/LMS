@@ -55,7 +55,7 @@ const LoginSignupPage = () => {
     setIsLoading(true); // Start loading
 
     try {
-      const response = await fetch("http://localhost:8080/auth/signin", {
+      const response = await fetch("https://libraymanagementsystem-production.up.railway.app/auth/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

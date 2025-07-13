@@ -1,5 +1,5 @@
 // services/userService.js
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'https://libraymanagementsystem-production.up.railway.app';
 
 // Fetch all users from API
 export const fetchUsers = async () => {
