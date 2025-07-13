@@ -12,7 +12,7 @@ const handleLogout = () => {
 
   const handleCancel = () => {
     setShowPopup(false);
-    window.location.href = '/';
+    window.history.back();
 
   };
 

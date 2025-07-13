@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import "../styling/SignUp.css";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  showSuccess,
+  showError,
+  confirmDialog,
+  showInfo,
+} from "../utils/alertUtil"; 
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -48,7 +54,6 @@ const SignUp = () => {
 
     const { firstName, lastName, mobile, email, password, confirmPassword, role } = formData;
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
       return;
     }
 
@@ -73,7 +78,7 @@ const SignUp = () => {
         },
         body: JSON.stringify(dataToSend)
       });
-      alert("Email sent to verify");
+      await showInfo("Email verification link has been sent to your email address. Please verify your email before logging in.");
       if (response.ok) {
         console.log("Sign-up successful");
         navigate("/");

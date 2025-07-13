@@ -49,7 +49,7 @@ const BookTable = ({
                 <td>{book.category}</td>
                   <td>{book.type && book.type.name ? book.type.name : 'N/A'}</td>
                 <td>{book.language}</td>
-                <td>{book.quantity}</td>
+                <td>{book.availableCount}</td>
                 <td>
                   <span
                     className={`availability-status ${

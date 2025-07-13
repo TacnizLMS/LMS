@@ -5,6 +5,11 @@ import AppBar from "../components/appBar";
 import { getUserFinesById, payFineByCatalogId, payCatalogBookFine } from "../services/fineService";
 import { fetchCatalogs } from '../services/catalogService';
 import FineHeader from "../screens/user_Fine_Components/fine_header";
+import {
+  showSuccess,
+  showError,
+  confirmDialog,
+} from "../utils/alertUtil";
 
 const FinePage = () => {
     const [fines, setFines] = useState([]);
@@ -186,14 +191,14 @@ const FinePage = () => {
                                                                 <button
                                                                     className="catalog-pay-button"
                                                                     onClick={async () => {
-                                                                        const confirmPay = window.confirm(`Do you want to pay the fine for Catalog ID: ${catalog.id}?`);
+                                                                        const confirmPay = await confirmDialog(`Do you want to pay the fine for Catalog ID: ${catalog.id}?`);
                                                                         if (confirmPay) {
                                                                             const result = await payFineByCatalogId(catalog.id);
                                                                             console.log("Payment Result:", result);
                                                                             if (result) {
                                                                                 window.open(result, '_blank');
                                                                             } else {
-                                                                                alert('Failed to generate payment link.');
+                                                                                await showError("Failed to generate payment link.");
                                                                             }
                                                                         }
                                                                     }}
@@ -247,13 +252,13 @@ const FinePage = () => {
                                                                                     <button
                                                                                         className="pay-button"
                                                                                         onClick={async () => {
-                                                                                            const confirmPay = window.confirm(`Do you want to pay the fine for catalog book ID: ${item.id}?`);
+                                                                                            const confirmPay = await confirmDialog(`Do you want to pay the fine for Catalog Book ID: ${item.id}?`)
                                                                                             if (confirmPay) {
                                                                                                 const result = await payCatalogBookFine(catalog.id, item.id);
                                                                                                 if (result?.startsWith('http')) {
                                                                                                     window.open(result, '_blank');
                                                                                                 } else {
-                                                                                                    alert('Failed to generate payment link.');
+                                                                                                    await showError("Failed to generate payment link.");
                                                                                                 }
                                                                                             }
                                                                                         }}

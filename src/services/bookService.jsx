@@ -90,6 +90,7 @@ export const fetchBooks = async () => {
         : { id: "", name: "" },
       language: book.language,
       quantity: book.quantity || 0,
+      availableCount: book.availableCount || 0, // Use availableCount if present
       availability: availabilityToString(book.availability), // Convert boolean to string for UI
       availabilityBoolean: book.availability // Keep original boolean for reference
     }));
@@ -133,6 +134,7 @@ export const fetchBooksWithCredentials = async (username, password) => {
         : { id: "", name: "" },
       language: book.language,
       quantity: book.quantity || 0,
+      availableCount: book.availableCount || 0, // Use availableCount if present
       availability: availabilityToString(book.availability), // Convert boolean to string for UI
       availabilityBoolean: book.availability
     }));

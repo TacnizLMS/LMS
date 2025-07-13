@@ -90,6 +90,10 @@
 .user-table button:active {
   transform: scale(0.95);
 }
+@keyframes spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
 
 /* Admin layout styles */
 .admin-layout {
