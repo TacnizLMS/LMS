@@ -353,3 +353,47 @@ export const returnBackCatalog = async (catalogId) => {
     throw error;
   }
 };
+
+// get the recently expiring single catalog
+export const getRecentlyExpiringCatalog = async () => {
+  try {
+    const userId =sessionStorage.getItem("userId");
+    const url = `${API_BASE_URL}/catalog/recently-expire/${userId}`;
+    console.log('Fetching recently expiring catalog from:', url);
+
+    const token = getAuthToken();
+    console.log('Using token:', token ? `${token.substring(0, 20)}...` : 'No token found');
+
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = token;
+    }
+
+    console.log('Request headers:', headers);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+
+    console.log('Response status:', response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error fetching recently expiring catalog:', errorText);
+      throw new Error(`Failed to fetch recently expiring catalog. Status: ${response.status}, Message: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('Fetched recently expiring catalog:', data);
+
+    return data;
+
+  } catch (error) {
+    console.error('Error in getRecentlyExpiringCatalog:', error);
+    throw error;
+  }
+};
+
