@@ -54,3 +54,15 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
+
+.info-card-tooltip {
+  background-color: #fffbe6;
+  border: 1px solid #8B6C2F;
+  padding: 10px 8px ;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(139, 108, 47, 0.15);
+  z-index: 9999;
+  pointer-events: none;
+  max-width: 300px;
+  color: #815B10;
+}
