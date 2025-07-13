@@ -6,9 +6,30 @@ import CustomCard from "../components/customeCard";
 import { FaBookOpen } from "react-icons/fa";
 import CustomInfoCard from "../components/customInfoCard";
  import { GiReturnArrow,GiWhiteBook  } from "react-icons/gi";
+import { getRecentlyExpiringCatalog } from "../services/catalogService";
 
 const Dashboard = () => {
 
+  const [recentCatalog, setRecentCatalog] = React.useState(null);
+  const [remainingDays, setRemainingDays] = React.useState(null);
+
+  React.useEffect(() => {
+    async function fetchCatalog() {
+      try {
+        const catalog = await getRecentlyExpiringCatalog();
+        setRecentCatalog(catalog);
+        const expiredDate = new Date(catalog?.expiredDate);
+        const today = new Date();
+        const diffTime = expiredDate - today;
+        const remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        setRemainingDays(remainingDays);
+        // You can use remainingDays as needed, e.g. set it in state
+      } catch (error) {
+        setRecentCatalog(null);
+      }
+    }
+    fetchCatalog();
+  }, []);
 
   return (
     <div className="dashboard-container">
@@ -35,9 +56,14 @@ const Dashboard = () => {
             />
             <CustomInfoCard
               icon={<GiWhiteBook />}
-              title="Book Name : The Great Gatsby"
-              subtitle="Time Remaining : 2 Days"
-              to="/catalog"
+              title="Expiring Catalog"
+              subtitle={
+                recentCatalog
+                  ? `${remainingDays} Days Remaining`
+                  : "No expiring catalog"
+              }
+              details={recentCatalog}
+              
             />
           </div>
           <center>
