@@ -32,13 +32,19 @@ const BooksPage = () => {
     setCart(cart.filter((item) => item.id !== bookId));
   };
 
-  const handleIncreaseQuantity = (bookId) => {
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.id === bookId ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
-  };
+const handleIncreaseQuantity = (bookId) => {
+  setCart((prevCart) =>
+    prevCart.map((item) => {
+      const book = books.find((b) => b.id === item.id);
+      const maxQty = book?.availableCount ?? 10;
+      if (item.id === bookId && item.quantity < maxQty) {
+        return { ...item, quantity: item.quantity + 1 };
+      }
+      return item;
+    })
+  );
+};
+
 
   const handleDecreaseQuantity = (bookId) => {
     setCart((prevCart) =>

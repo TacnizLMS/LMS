@@ -3,7 +3,7 @@ import "../styling/book.css";
 import { IoClose } from "react-icons/io5";
 import { FiShoppingCart } from "react-icons/fi";
 import { createCatalog } from "../services/catalogService";
-import { showSuccess, showError, confirmDialog } from "../utils/alertUtil";
+import { showSuccess, showError } from "../utils/alertUtil";
 
 const CartModal = ({
   cartItems,
@@ -30,7 +30,8 @@ const CartModal = ({
       onClose(); // Close the modal
     } catch (error) {
       console.error("Failed to create catalog:", error);
-  await showError("Failed to create catalog. Please try again.");}
+      await showError("Failed to create catalog. Please try again.");
+    }
   };
 
   return (
@@ -67,49 +68,59 @@ const CartModal = ({
                 </td>
               </tr>
             ) : (
-              cartItems.map((book, index) => (
-                <React.Fragment key={index}>
-                  <tr>
-                    <td style={{ padding: "8px 16px" }}>{book.id}</td>
-                    <td style={{ padding: "8px 16px" }}>{book.name}</td>
-                    <td style={{ padding: "8px 16px" }}>{book.category}</td>
-                    <td style={{ padding: "8px 16px" }}>{book.language}</td>
-                    <td style={{ padding: "8px 16px" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                        }}
-                      >
-                        <button
-                          className="qMarks"
-                          onClick={() => decreaseQty(book.id)}
+              cartItems.map((book, index) => {
+                const isMaxQuantityReached = book.quantity >= book.availableCount;
+                
+                return (
+                  <React.Fragment key={index}>
+                    <tr>
+                      <td style={{ padding: "8px 16px" }}>{book.id}</td>
+                      <td style={{ padding: "8px 16px" }}>{book.name}</td>
+                      <td style={{ padding: "8px 16px" }}>{book.category}</td>
+                      <td style={{ padding: "8px 16px" }}>{book.language}</td>
+                      <td style={{ padding: "8px 16px" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                          }}
                         >
-                          -
+                          <button
+                            className="qMarks"
+                            onClick={() => decreaseQty(book.id)}
+                          >
+                            -
+                          </button>
+                          <span>{book.quantity}</span>
+                          <button
+                            className="qMarks"
+                            onClick={() => increaseQty(book.id)}
+                            disabled={isMaxQuantityReached}
+                            style={{
+                              cursor: isMaxQuantityReached ? 'not-allowed' : 'pointer',
+                              opacity: isMaxQuantityReached ? 0.5 : 1,
+                              backgroundColor: isMaxQuantityReached ? '#ccc' : ''
+                            }}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </td>
+                      <td style={{ padding: "8px 16px" }}>
+                        <button onClick={() => removeFromCart(book.id)}>
+                          Delete
                         </button>
-                        <span>{book.quantity}</span>
-                        <button
-                          className="qMarks"
-                          onClick={() => increaseQty(book.id)}
-                        >
-                          +
-                        </button>
-                      </div>
-                    </td>
-                    <td style={{ padding: "8px 16px" }}>
-                      <button onClick={() => removeFromCart(book.id)}>
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                  {index !== cartItems.length - 1 && (
-                    <tr style={{ height: "5px" }}>
-                      <td colSpan="6"></td>
+                      </td>
                     </tr>
-                  )}
-                </React.Fragment>
-              ))
+                    {index !== cartItems.length - 1 && (
+                      <tr style={{ height: "5px" }}>
+                        <td colSpan="6"></td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })
             )}
           </tbody>
         </table>

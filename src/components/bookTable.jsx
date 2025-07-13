@@ -42,49 +42,70 @@ const BookTable = ({
         </thead>
         <tbody>
           {books && books.length > 0 ? (
-            books.map((book) => (
-              <tr key={book.id}>
-                <td>{book.id}</td>
-                <td>{book.name}</td>
-                <td>{book.category}</td>
+            books.map((book) => {
+              const currentQuantity = getQuantity(book.id);
+              const isMaxQuantityReached = currentQuantity >= book.availableCount;
+              const isOutOfStock = book.availableCount === 0;
+              
+              return (
+                <tr key={book.id}>
+                  <td>{book.id}</td>
+                  <td>{book.name}</td>
+                  <td>{book.category}</td>
                   <td>{book.type && book.type.name ? book.type.name : 'N/A'}</td>
-                <td>{book.language}</td>
-                <td>{book.availableCount}</td>
-                <td>
-                  <span
-                    className={`availability-status ${
-                      book.availability === "Available"
-                        ? "available"
-                        : "not-available"
-                    }`}
-                  >
-                    {book.availability}
-                  </span>
-                </td>
-                <td>
-                  {book.availability === "Available" && (
-                    <input
-                      type="checkbox"
-                      checked={isInCart(book.id)}
-                      onChange={(e) =>
-                        handleCheckboxChange(book, e.target.checked)
-                      }
-                    />
-                  )}
-                </td>
-                {showQuantityColumn && (
+                  <td>{book.language}</td>
+                  <td>{book.availableCount}</td>
                   <td>
-                    {isInCart(book.id) && (
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <button onClick={() => handleDecreaseQuantity(book.id)}>-</button>
-                        <span>{getQuantity(book.id)}</span>
-                        <button onClick={() => handleIncreaseQuantity(book.id)}>+</button>
-                      </div>
+                    <span
+                      className={`availability-status ${
+                        book.availability === "Available"
+                          ? "available"
+                          : "not-available"
+                      }`}
+                    >
+                      {book.availability}
+                    </span>
+                  </td>
+                  <td>
+                    {book.availability === "Available" && (
+                      <input
+                        type="checkbox"
+                        checked={isInCart(book.id)}
+                        disabled={isOutOfStock}
+                        onChange={(e) =>
+                          handleCheckboxChange(book, e.target.checked)
+                        }
+                        style={{
+                          cursor: isOutOfStock ? 'not-allowed' : 'pointer',
+                          opacity: isOutOfStock ? 0.5 : 1
+                        }}
+                      />
                     )}
                   </td>
-                )}
-              </tr>
-            ))
+                  {showQuantityColumn && (
+                    <td>
+                      {isInCart(book.id) && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <button onClick={() => handleDecreaseQuantity(book.id)}>-</button>
+                          <span>{currentQuantity}</span>
+                          <button 
+                            onClick={() => handleIncreaseQuantity(book.id)}
+                            disabled={isMaxQuantityReached}
+                            style={{
+                              cursor: isMaxQuantityReached ? 'not-allowed' : 'pointer',
+                              opacity: isMaxQuantityReached ? 0.5 : 1,
+                              backgroundColor: isMaxQuantityReached ? '#ccc' : ''
+                            }}
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  )}
+                </tr>
+              );
+            })
           ) : (
             <tr>
               <td colSpan={showQuantityColumn ? "9" : "8"} style={{ textAlign: "center" }}>
