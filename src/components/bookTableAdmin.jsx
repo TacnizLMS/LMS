@@ -24,7 +24,8 @@ const BookTableAdmin = ({ books, onEditBook, onDeleteBook }) => {
             <th>Author</th>
             <th>Type</th>
             <th>Language</th>
-            <th>Quantity</th>
+            <th>Full Quantity</th>
+            <th>Available Quantity</th>
             <th>Availability</th>
             <th>Action</th>
           </tr>
@@ -38,7 +39,9 @@ const BookTableAdmin = ({ books, onEditBook, onDeleteBook }) => {
                 <td>{safeRender(book.category)}</td>
                 <td>{safeRender(book.type)}</td>
                 <td>{safeRender(book.language)}</td>
-                <td>{book.availableCount}</td>
+              <td style={{ textAlign: "center" }}>{safeRender(book.quantity)}</td>
+                <td style={{ textAlign: "center" }}>{safeRender(book.availableCount)}</td>
+                
                 <td>
                   <span
                     className={`availability-status ${
@@ -109,7 +112,7 @@ const BookTableAdmin = ({ books, onEditBook, onDeleteBook }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="8" style={{ textAlign: "center" }}>
+              <td colSpan="9" style={{ textAlign: "center" }}>
                 No records found
               </td>
             </tr>

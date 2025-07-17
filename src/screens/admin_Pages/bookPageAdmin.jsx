@@ -66,6 +66,7 @@ const BooksPageAdmin = () => {
         (typeof book.type === "string" ? book.type : "Unknown"),
       language: book.language,
       availablequantity: book.availableCount || 0,
+      quantity: book.quantity || 0, // Add quantity to transformed book
       availability: availabilityToString(book.availability),
       availabilityBoolean: book.availability,
     };
@@ -111,6 +112,10 @@ const BooksPageAdmin = () => {
 
     Object.keys(updated).forEach((key) => {
       if (original[key] !== updated[key]) {
+        // Skip quantity if it's 0 or empty
+        if (key === 'quantity' && (!updated[key] || updated[key] === 0 || updated[key] === '0')) {
+          return;
+        }
         changes[key] = updated[key];
       }
     });
@@ -120,7 +125,10 @@ const BooksPageAdmin = () => {
 
   // Handle edit book click
   const handleEditBook = (book) => {
-    setEditingBook({ ...book });
+    const editBook = { ...book };
+    // Set quantity to 0 as default for edit
+    editBook.quantity = 0;
+    setEditingBook(editBook);
     setOriginalBook({ ...book });
     setShowEditModal(true);
   };
@@ -134,6 +142,12 @@ const BooksPageAdmin = () => {
       changedFields.availability = editingBook.availability;
       changedFields.availabilityBoolean =
         editingBook.availability === "Available";
+
+      // If quantity is provided and not 0, update both quantity and available quantity
+      if (editingBook.quantity && editingBook.quantity !== 0 && editingBook.quantity !== '0') {
+        changedFields.quantity = parseInt(editingBook.quantity);
+        changedFields.availableCount = parseInt(editingBook.quantity);
+      }
 
       const updatedBook = await updateBook(editingBook.id, changedFields);
 
@@ -152,6 +166,8 @@ const BooksPageAdmin = () => {
       setEditingBook(null);
       setOriginalBook(null);
       await showSuccess("Book updated successfully!");
+      window.location.reload();
+
     } catch (error) {
       console.error("Failed to update book:", error);
       await showError("Failed to update book. Please try again.");
@@ -176,6 +192,8 @@ const BooksPageAdmin = () => {
         quantity: 1,
       });
       await showSuccess("Book added successfully!");
+      window.location.reload();
+
     } catch (error) {
       console.error("Failed to add book:", error);
       await showError("Failed to add book. Please try again.");
@@ -309,52 +327,58 @@ const BooksPageAdmin = () => {
         )}
 
         {/* Edit Book Modal */}
-        {showEditModal && editingBook && (
-          <div className="modal-overlayBook">
-            <div className="modal-contentBook">
-              <h2>Edit Book</h2>
-              <label>
-                Title:{" "}
-                <input
-                  value={editingBook.name}
-                  onChange={(e) =>
-                    setEditingBook({
-                      ...editingBook,
-                      name: e.target.value,
-                      availabilityBoolean: e.target.value === "Available",
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Author:{" "}
-                <input
-                  value={editingBook.category}
-                  onChange={(e) =>
-                    setEditingBook({ ...editingBook, category: e.target.value })
-                  }
-                />
-              </label>
+          {showEditModal && editingBook && (
+            <div className="modal-overlayBook">
+              <div className="modal-contentBook">
+                <h2>Edit Book</h2>
+                <label>
+            Title:{" "}
+            <input
+              value={editingBook.name}
+              onChange={(e) =>
+                setEditingBook({
+                  ...editingBook,
+                  name: e.target.value,
+                  availabilityBoolean: e.target.value === "Available",
+                })
+              }
+            />
+                </label>
+                <label>
+            Author:{" "}
+            <input
+              value={editingBook.category}
+              onChange={(e) =>
+                setEditingBook({ ...editingBook, category: e.target.value })
+              }
+            />
+                </label>
 
-              <label>
-                Quantity:{" "}
-                <input
-                  type="number"
-                  value={editingBook.quantity ?? ""}
-                  onChange={(e) =>
-                    setEditingBook({
-                      ...editingBook,
-                      quantity: e.target.value,
-                    })
-                  }
-                />
-              </label>
+                <label>
+            Quantity:{" "}
+            <br />
+             <span style={{ fontSize: "0.85em", color: "#888" }}>
+            ⚠️ Add a minus value to remove book quantity 
+            </span>
+            <input
+              type="number"
+              value={editingBook.quantity}
+              placeholder="Enter quantity to add/remove"
+              onChange={(e) =>
+                setEditingBook({
+                  ...editingBook,
+                  quantity: e.target.value,
+                })
+              }
+            />
+           
+                </label>
 
-              <label>
-                Type:
-                <select
-                  value={editingBook.type?.id || ""}
-                  onChange={(e) => {
+                <label>
+            Type:
+            <select
+              value={editingBook.type?.id || ""}
+              onChange={(e) => {
                     const selected = bookTypes.find(
                       (t) => t.id === e.target.value
                     );

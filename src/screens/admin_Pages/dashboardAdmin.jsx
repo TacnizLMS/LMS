@@ -159,7 +159,7 @@ const DashboardAdmin = () => {
               icon={<FaUser />}
               title={`${getStoredUserCount().count} Users`}
               subtitle="Total User Based"
-              to="/users-admin"
+              to="/userPageAdmin"
             />
             <CustomInfoCard
               icon={<FaBookOpen />}
