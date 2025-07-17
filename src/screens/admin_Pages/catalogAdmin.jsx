@@ -144,61 +144,6 @@ const CatalogAdmin = () => {
     }
   };
 
-  // Return all books in a catalog
-  const returnAllBooks = async (catalogId) => {
-    try {
-      const catalog = catalogs.find((c) => c.id === catalogId);
-      if (!catalog) return;
-
-      // Prepare data for all unreturned books
-      const booksToReturn = catalog.catalogBooks
-        .filter((book) => !book.returnState)
-        .map((book) => ({
-          bookId: book.book.id,
-          quantity: 1,
-          returnState: true,
-        }));
-
-      if (booksToReturn.length === 0) {
-        await showInfo("All books in this catalog are already returned.");
-        return;
-      }
-
-      console.log("Returning all books:", booksToReturn);
-
-      // Call the API to update all books
-      await updateCatalog(catalogId, booksToReturn);
-
-      // Update local state
-      setCatalogs((prevCatalogs) => {
-        const updatedCatalogs = prevCatalogs.map((catalog) => {
-          if (catalog.id !== catalogId) return catalog;
-
-          const updatedBooks = catalog.catalogBooks.map((book) => ({
-            ...book,
-            returnState: true,
-          }));
-
-          return {
-            ...catalog,
-            catalogBooks: updatedBooks,
-            completeState: "complete", // Set to "complete" string
-          };
-        });
-
-        // Update catalog count after returning books
-        storeCatalogCount(updatedCatalogs.length);
-
-        return updatedCatalogs;
-      });
-
-      await showSuccess(`Successfully returned ${booksToReturn.length} books.`);
-    } catch (error) {
-      console.error("Failed to return all books:", error);
-      await showError("Failed to return all books. Please try again.");
-    }
-  };
-
   // Return back all books in a completed catalog
   const returnBackAllBooks = async (catalogId) => {
     try {
@@ -655,19 +600,7 @@ const CatalogAdmin = () => {
                         )}
                       </div>
                       <div className="catalog-actions">
-                        {/* Return All Button - only show for active/expired catalogs with unreturned books */}
-                        {(activeTab === "active" || activeTab === "expired") &&
-                          catalog.catalogBooks.some(
-                            (book) => !book.returnState
-                          ) && (
-                            <button
-                              className="return-</div>all-btn"
-                              onClick={() => returnAllBooks(catalog.id)}
-                              title="Return all books in this catalog"
-                            >
-                              <FaUndo /> Return All
-                            </button>
-                          )}
+                       
 
                         {/* Return Back All Button - only show for completed catalogs */}
                         {activeTab === "completed" && (
