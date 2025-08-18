@@ -132,11 +132,15 @@ const CartModal = ({
             justifyContent: "space-between",
           }}
         >
-          <h4 style={{ margin: 0 }}>
+          <h4 style={{ margin: 0, color: "black" }}>
             Total Books:{" "}
             {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
           </h4>
-          <button onClick={handleConfirm}>Confirm</button>
+          {cartItems.reduce((sum, item) => sum + item.quantity, 0) === 0 ? (
+            <button onClick={onClose}>Cancel</button>
+          ) : (
+            <button onClick={handleConfirm}>Confirm</button>
+          )}
         </div>
       </div>
     </div>
