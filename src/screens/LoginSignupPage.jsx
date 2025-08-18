@@ -2,11 +2,8 @@ import React, { useState } from "react";
 import "../styling/LoginSignupPage.css";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import {
-  showSuccess,
-  showError,
-  confirmDialog,
-} from "../utils/alertUtil";
+import { showSuccess, showError, confirmDialog } from "../utils/alertUtil";
+import { BiFontSize } from "react-icons/bi";
 
 const LoginSignupPage = () => {
   const [emailError, setEmailError] = useState("");
@@ -51,17 +48,19 @@ const LoginSignupPage = () => {
 
     if (!valid) return;
 
-
     setIsLoading(true); // Start loading
 
     try {
-      const response = await fetch("https://libraymanagementsystem-production-9bbb.up.railway.app/auth/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        "https://libraymanagementsystem-production-9bbb.up.railway.app/auth/signin",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       const data = await response.json();
       console.log("Response:", data);
@@ -87,9 +86,17 @@ role: "User"
 
         console.log("Login message:", data.message);
         decodeJwt();
-        if (data.message === "Login success" && data.jwt !== null && payload.roles.includes("Admin")) {
+        if (
+          data.message === "Login success" &&
+          data.jwt !== null &&
+          payload.roles.includes("Admin")
+        ) {
           navigate("/admin-dashboard");
-        } else if (data.message === "Login success" && data.jwt !== null && payload.roles.includes("User")) {
+        } else if (
+          data.message === "Login success" &&
+          data.jwt !== null &&
+          payload.roles.includes("User")
+        ) {
           navigate("/dashboard");
         }
       } else {
@@ -112,11 +119,15 @@ role: "User"
         <p>Please enter your credentials to log in</p>
 
         <div className="input-group">
+          <label style={{ fontSize: 15, fontWeight: "bold" }}>Email</label>
+
           <input type="text" placeholder="Email" disabled={isLoading} />
           {emailError && <p className="error-text">{emailError}</p>}
         </div>
 
         <div className="input-group">
+          <label style={{ fontSize: 15, fontWeight: "bold" }}>Password</label>
+
           <input type="password" placeholder="Password" disabled={isLoading} />
           {passwordError && <p className="error-text">{passwordError}</p>}
         </div>
@@ -132,16 +143,23 @@ role: "User"
             disabled={isLoading}
             style={{
               opacity: isLoading ? 0.5 : 1,
-              cursor: isLoading ? 'not-allowed' : 'pointer'
+              cursor: isLoading ? "not-allowed" : "pointer",
             }}
           >
             {isLoading ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                }}
+              >
                 <div className="spinner"></div>
                 Signing In...
               </div>
             ) : (
-              'SIGN IN'
+              "SIGN IN"
             )}
           </button>
         </center>

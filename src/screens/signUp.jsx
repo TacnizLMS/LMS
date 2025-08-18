@@ -6,7 +6,7 @@ import {
   showError,
   confirmDialog,
   showInfo,
-} from "../utils/alertUtil"; 
+} from "../utils/alertUtil";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const SignUp = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "User" // Default role
+    role: "User", // Default role
   });
 
   const [errors, setErrors] = useState({});
@@ -28,13 +28,21 @@ const SignUp = () => {
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.firstName.trim()) newErrors.firstName = "First name is required.";
-    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required.";
-    if (!formData.mobile.trim()) newErrors.mobile = "Contact number is required.";
+    if (!formData.firstName.trim())
+      newErrors.firstName = "First name is required.";
+    if (!formData.lastName.trim())
+      newErrors.lastName = "Last name is required.";
+    if (!formData.mobile.trim())
+      newErrors.mobile = "Contact number is required.";
     if (!formData.email.trim()) newErrors.email = "Email is required.";
     if (!formData.password.trim()) newErrors.password = "Password is required.";
-    if (!formData.confirmPassword.trim()) newErrors.confirmPassword = "Confirm password is required.";
-    if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
+    if (!formData.confirmPassword.trim())
+      newErrors.confirmPassword = "Confirm password is required.";
+    if (
+      formData.password &&
+      formData.confirmPassword &&
+      formData.password !== formData.confirmPassword
+    ) {
       newErrors.confirmPassword = "Passwords do not match.";
     }
 
@@ -52,11 +60,18 @@ const SignUp = () => {
       return; // on't submit if errors exist
     }
 
-    const { firstName, lastName, mobile, email, password, confirmPassword, role } = formData;
+    const {
+      firstName,
+      lastName,
+      mobile,
+      email,
+      password,
+      confirmPassword,
+      role,
+    } = formData;
     if (password !== confirmPassword) {
       return;
     }
-
 
     const dataToSend = {
       fullName: `${firstName} ${lastName}`,
@@ -64,21 +79,26 @@ const SignUp = () => {
       mobile,
       email,
       password,
-      role
+      role,
     };
 
     setIsLoading(true); // Start loading
 
     try {
       console.log(dataToSend);
-      const response = await fetch("https://libraymanagementsystem-production-9bbb.up.railway.app/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dataToSend)
-      });
-      await showInfo("Email verification link has been sent to your email address. Please verify your email before logging in.");
+      const response = await fetch(
+        "https://libraymanagementsystem-production-9bbb.up.railway.app/auth/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataToSend),
+        }
+      );
+      await showInfo(
+        "Email verification link has been sent to your email address. Please verify your email before logging in."
+      );
       if (response.ok) {
         console.log("Sign-up successful");
         navigate("/");
@@ -98,12 +118,12 @@ const SignUp = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
 
     setErrors({
       ...errors,
-      [name]: ""
+      [name]: "",
     });
     setServerError(""); // Clear server error if user starts editing
   };
@@ -112,10 +132,16 @@ const SignUp = () => {
     <div className="signup-container">
       {/* Left Section */}
       <div className="leftsection">
-        <center><div className="logo"></div></center>
-        <h2>ReadSphere <span>LIBRARY</span></h2>
+        <center>
+          <div className="logo"></div>
+        </center>
+        <h2>
+          ReadSphere <span>LIBRARY</span>
+        </h2>
         <p>Already have an account? Sign in now.</p>
-        <Link to="/"><button className="signin-btn">SIGN IN</button></Link>
+        <Link to="/">
+          <button className="signin-btn">SIGN IN</button>
+        </Link>
       </div>
 
       {/* Right Section */}
@@ -129,6 +155,10 @@ const SignUp = () => {
 
         <form className="form" onSubmit={handleSubmit}>
           <div className="rowdropdown">
+            <label style={{ fontSize: 12, fontWeight: "bold" }}>
+              Select Role
+            </label>
+
             <select
               name="role"
               value={formData.role}
@@ -143,6 +173,9 @@ const SignUp = () => {
 
           <div className="row">
             <div className="input-group">
+              <label style={{ fontSize: 12, fontWeight: "bold" }}>
+                First Name
+              </label>
               <input
                 type="text"
                 name="firstName"
@@ -151,10 +184,16 @@ const SignUp = () => {
                 onChange={handleChange}
                 disabled={isLoading}
               />
-              {errors.firstName && <div className="error-text">{errors.firstName}</div>}
+              {errors.firstName && (
+                <div className="error-text">{errors.firstName}</div>
+              )}
             </div>
 
             <div className="input-group">
+              <label style={{ fontSize: 12, fontWeight: "bold" }}>
+                Last Name
+              </label>
+
               <input
                 type="text"
                 name="lastName"
@@ -163,12 +202,17 @@ const SignUp = () => {
                 onChange={handleChange}
                 disabled={isLoading}
               />
-              {errors.lastName && <div className="error-text">{errors.lastName}</div>}
+              {errors.lastName && (
+                <div className="error-text">{errors.lastName}</div>
+              )}
             </div>
           </div>
 
           <div className="row">
             <div className="input-group">
+              <label style={{ fontSize: 12, fontWeight: "bold" }}>
+                Contact No
+              </label>
               <input
                 type="text"
                 name="mobile"
@@ -177,10 +221,13 @@ const SignUp = () => {
                 onChange={handleChange}
                 disabled={isLoading}
               />
-              {errors.mobile && <div className="error-text">{errors.mobile}</div>}
+              {errors.mobile && (
+                <div className="error-text">{errors.mobile}</div>
+              )}
             </div>
 
             <div className="input-group">
+              <label style={{ fontSize: 12, fontWeight: "bold" }}>Email</label>
               <input
                 type="email"
                 name="email"
@@ -195,6 +242,9 @@ const SignUp = () => {
 
           <div className="row">
             <div className="input-group">
+              <label style={{ fontSize: 12, fontWeight: "bold" }}>
+                Password
+              </label>
               <input
                 type="password"
                 name="password"
@@ -203,10 +253,15 @@ const SignUp = () => {
                 onChange={handleChange}
                 disabled={isLoading}
               />
-              {errors.password && <div className="error-text">{errors.password}</div>}
+              {errors.password && (
+                <div className="error-text">{errors.password}</div>
+              )}
             </div>
 
             <div className="input-group">
+              <label style={{ fontSize: 12, fontWeight: "bold" }}>
+                Confirm Password
+              </label>
               <input
                 type="password"
                 name="confirmPassword"
@@ -215,26 +270,35 @@ const SignUp = () => {
                 onChange={handleChange}
                 disabled={isLoading}
               />
-              {errors.confirmPassword && <div className="error-text">{errors.confirmPassword}</div>}
+              {errors.confirmPassword && (
+                <div className="error-text">{errors.confirmPassword}</div>
+              )}
             </div>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="signup-btn"
             disabled={isLoading}
             style={{
               opacity: isLoading ? 0.5 : 1,
-              cursor: isLoading ? 'not-allowed' : 'pointer'
+              cursor: isLoading ? "not-allowed" : "pointer",
             }}
           >
             {isLoading ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                }}
+              >
                 <div className="spinner"></div>
                 Signing Up...
               </div>
             ) : (
-              'SIGN UP'
+              "SIGN UP"
             )}
           </button>
         </form>
