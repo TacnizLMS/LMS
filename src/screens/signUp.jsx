@@ -71,7 +71,7 @@ const SignUp = () => {
 
     try {
       console.log(dataToSend);
-      const response = await fetch("https://libraymanagementsystem-production.up.railway.app/auth/signup", {
+      const response = await fetch("https://libraymanagementsystem-production-9bbb.up.railway.app/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://libraymanagementsystem-production.up.railway.app/';
+const API_BASE_URL = 'https://libraymanagementsystem-production-9bbb.up.railway.app/';
 
 // Debug function to check all possible token locations
 const getAuthToken = () => {

@@ -1,6 +1,6 @@
 // services/catalogService.js
 
-const API_BASE_URL = 'https://libraymanagementsystem-production.up.railway.app/api';
+const API_BASE_URL = 'https://libraymanagementsystem-production-9bbb.up.railway.app/api';
 
 // Debug function to get auth token from various storage locations
 const getAuthToken = () => {
